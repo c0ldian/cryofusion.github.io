@@ -38,7 +38,7 @@
       <h2 class="text-lg font-semibold mb-4 text-gray-200">计算原理</h2>
       <div class="prose max-w-none text-gray-300">
         <p>距离保护通过测量阻抗判断故障位置。当测量阻抗小于整定值时动作。</p>
-        <p class="my-2 text-lg font-mono text-gray-200">动作圆特性：|Z| <= Z_n</p>
+        <p class="my-2 text-lg font-mono text-gray-200"><KaTeX :formula="'|Z| \\le Z_n'" displayMode /></p>
       </div>
     </div>
 
@@ -53,6 +53,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import KaTeX from '../components/KaTeX.vue'
 
 const form = reactive({ zn: '', zLine: '' })
 const result = ref(null)

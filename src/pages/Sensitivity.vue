@@ -35,7 +35,7 @@
       <h2 class="text-lg font-semibold mb-4 text-gray-200">计算原理</h2>
       <div class="prose max-w-none text-gray-300">
         <p>灵敏度校验：最小短路电流与保护启动值之比。</p>
-        <p class="my-2 text-lg font-mono text-gray-200">K_sen = I_min / I_op</p>
+        <p class="my-2 text-lg font-mono text-gray-200"><KaTeX :formula="'K_{sen} = \\frac{I_{min}}{I_{op}}'" displayMode /></p>
         <p>一般要求 K_sen ≥ 1.5（过流保护）或满足规程最低灵敏度要求。</p>
       </div>
     </div>
@@ -51,6 +51,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import KaTeX from '../components/KaTeX.vue'
 
 const form = reactive({ minShortCurrent: '', protectionSetting: '' })
 const result = ref(null)

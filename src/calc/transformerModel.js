@@ -1,15 +1,15 @@
 // 两绕组主变模型（高压、低压）
 
-export function calculateRatedCurrents(capacity, voltages) {
+export function calculateRatedCurrents(capacityMVA, voltageHV_kV, voltageLV_kV) {
   // I_rated_primary = S / (√3 × U)
   const sqrt3 = Math.sqrt(3)
   const toCurrent = (U) => {
     if (!U || U === 0) return null
-    return (capacity * 1000) / (sqrt3 * U)
+    return (capacityMVA * 1000) / (sqrt3 * U)
   }
   return {
-    hv: voltages.hv ? toCurrent(voltages.hv) : null,
-    lv: voltages.lv ? toCurrent(voltages.lv) : null,
+    hv: toCurrent(voltageHV_kV),
+    lv: toCurrent(voltageLV_kV),
   }
 }
 

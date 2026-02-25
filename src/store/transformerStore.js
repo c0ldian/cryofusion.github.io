@@ -19,8 +19,8 @@ export const useTransformerStore = defineStore('transformer', () => {
 
   const ratedCurrentsPrimary = computed(() => {
     const { capacity, voltages } = params
-    if (!capacity || !voltages.hv) return { hv: null, lv: null }
-    const currents = calculateRatedCurrents(capacity, voltages)
+    if (!capacity || !voltages.hv || !voltages.lv) return { hv: null, lv: null }
+    const currents = calculateRatedCurrents(capacity, voltages.hv, voltages.lv)
     return {
       hv: currents.hv,
       lv: currents.lv,
@@ -29,7 +29,7 @@ export const useTransformerStore = defineStore('transformer', () => {
 
   const ratedCurrentsSecondary = computed(() => {
     const pri = ratedCurrentsPrimary.value
-    if (!pri.hv) return { hv: null, lv: null }
+    if (!pri.hv || !pri.lv) return { hv: null, lv: null }
     const sec = calculateSecondaryCurrents(pri, params.ctRatios)
     return {
       hv: sec.hv !== null ? roundTo(sec.hv, 4) : null,
@@ -47,10 +47,15 @@ export const useTransformerStore = defineStore('transformer', () => {
     }
   })
 
+  const deviceFactor = computed(() =>
+    params.deviceConfig === 'delta-to-wye' ? 1 / Math.sqrt(3) : Math.sqrt(3)
+  )
+
   return {
     params,
     ratedCurrentsPrimary,
     ratedCurrentsSecondary,
     conversionFactors,
+    deviceFactor,
   }
 })

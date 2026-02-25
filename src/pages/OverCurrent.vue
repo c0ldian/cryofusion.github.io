@@ -76,7 +76,7 @@
       <h2 class="text-lg font-semibold mb-4 text-gray-200">计算原理</h2>
       <div class="prose max-w-none text-gray-300">
         <p>过流保护整定电流：</p>
-        <p class="my-2 text-lg font-mono text-gray-200">I_op = K_rel × K_re × I_load</p>
+        <p class="my-2 text-lg font-mono text-gray-200"><KaTeX :formula="'I_{op} = K_{rel} \\times K_{re} \\times I_{load}'" displayMode /></p>
         <ul class="list-disc ml-6 space-y-2">
           <li><strong>K_rel</strong>：可靠系数（通常 1.2~1.3）</li>
           <li><strong>K_re</strong>：返回系数（通常 0.85~0.95）</li>
@@ -95,6 +95,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import KaTeX from '../components/KaTeX.vue'
 
 const form = reactive({
   loadCurrent: '',

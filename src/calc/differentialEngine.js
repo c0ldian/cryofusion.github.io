@@ -50,11 +50,13 @@ export function checkOperatingCriteria(I_diff, I_res, Id_min, I_break, k1, k2) {
   return { operate, region }
 }
 
-// 生成测试电流序列
-export function generateTestCurrents(Id_min, I_break) {
+// 生成测试电流序列（基于 I_break）
+export function generateTestCurrents(I_break) {
+  if (I_break === 0 || I_break == null) return []
   const start = roundTo(0.5 * I_break, 4)
   const end = roundTo(3 * I_break, 4)
   const step = roundTo(0.5 * I_break, 4)
+  if (step === 0) return [] // 防止除零/死循环
   const seq = []
   for (let I = start; I <= end + 1e-9; I += step) {
     seq.push(roundTo(I, 4))

@@ -50,9 +50,7 @@
       <h2 class="text-lg font-semibold mb-4 text-gray-200">计算原理</h2>
       <div class="prose max-w-none text-gray-300">
         <p>短路电流计算基于标幺值法：</p>
-        <p class="my-2 text-lg font-mono text-gray-200">
-          I_k = S_n / (√3 * U_n * (u_k/100))
-        </p>
+        <p class="my-2 text-lg font-mono text-gray-200"><KaTeX :formula="'I_k = \\frac{S_n}{\\sqrt{3} \\cdot U_n \\cdot (u_k/100)}'" displayMode /></p>
         <ul class="list-disc ml-6 space-y-2">
           <li><strong>S_n</strong>：系统短路容量 (MVA)</li>
           <li><strong>U_n</strong>：系统额定电压 (kV)</li>
@@ -75,6 +73,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import KaTeX from '../components/KaTeX.vue'
 
 const form = reactive({
   systemVoltage: '',

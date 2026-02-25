@@ -33,7 +33,7 @@
       <h2 class="text-lg font-semibold mb-4 text-gray-200">计算原理</h2>
       <div class="prose max-w-none text-gray-300">
         <p>自动重合闸时间整定为保护动作时间、断路器固有分闸时间加上安全裕度：</p>
-        <p class="my-2 text-lg font-mono text-gray-200">T_out = T_prot + T_breaker + T_margin</p>
+        <p class="my-2 text-lg font-mono text-gray-200"><KaTeX :formula="'T_{out} = T_{prot} + T_{breaker} + T_{margin}'" displayMode /></p>
         <p>确保在故障清除后再重合。</p>
       </div>
     </div>
@@ -49,6 +49,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import KaTeX from '../components/KaTeX.vue'
 
 const form = reactive({ protectionTripTime: '', breakerTime: '', safetyMargin: '' })
 const result = ref(null)

@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/katex": "^0.16.8",
     "echarts": "^6.0.0",
     "katex": "^0.16.33",
     "pinia": "^3.0.4",
