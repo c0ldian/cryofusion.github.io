@@ -24,7 +24,7 @@
         <button @click="copyResults" :disabled="toast.show" class="text-sm bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 rounded border border-gray-600 transition disabled:opacity-50">复制结果</button>
       </div>
       <div class="p-6 bg-blue-900/50 border border-blue-700/30 rounded-xl text-center mb-6">
-        <p class="text-gray-400 mb-2">过流保护启动电流 I<sub>op</sub></p>
+        <p class="text-gray-400 mb-2">过流保护启动电流 I_op</p>
         <p class="text-4xl font-bold text-blue-400">{{ result.toFixed(2) }} <span class="text-2xl">A</span></p>
       </div>
 
@@ -68,7 +68,6 @@
 
         <div class="mt-4 flex gap-3">
           <button @click="copyTestPlan" :disabled="toast.show" class="text-sm bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded border transition disabled:opacity-50">复制校验模板</button>
-          <button @click="copyTestPlanInline" v-if="false" class="text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 px-4 py-2 rounded border transition">复制简化流程</button>
         </div>
       </div>
     </div>
@@ -77,10 +76,10 @@
       <h2 class="text-lg font-semibold mb-4 text-gray-200">计算原理</h2>
       <div class="prose max-w-none text-gray-300">
         <p>过流保护整定电流：</p>
-        <p class="my-2 text-lg font-mono text-gray-200">I<sub>op</sub> = K<sub>rel</sub> × K<sub>re</sub> × I<sub>load</sub></p>
+        <p class="my-2 text-lg font-mono text-gray-200">I_op = K_rel × K_re × I_load</p>
         <ul class="list-disc ml-6 space-y-2">
-          <li><strong>K<sub>rel</sub></strong>：可靠系数（通常 1.2~1.3）</li>
-          <li><strong>K<sub>re</sub></strong>：返回系数（通常 0.85~0.95）</li>
+          <li><strong>K_rel</strong>：可靠系数（通常 1.2~1.3）</li>
+          <li><strong>K_re</strong>：返回系数（通常 0.85~0.95）</li>
         </ul>
       </div>
     </div>
@@ -95,7 +94,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed, watch } from 'vue'
+import { reactive, ref } from 'vue'
 
 const form = reactive({
   loadCurrent: '',
@@ -104,8 +103,6 @@ const form = reactive({
 })
 const result = ref(null)
 const toast = reactive({ show: false, message: '' })
-
-// 校验配置
 const testConfig = reactive({
   nonActCoeff: 0.95,
   actCoeff: 1.00,
@@ -143,9 +140,8 @@ function copyResults() {
   })
 }
 
-// 复制校验模板
 function copyTestPlan() {
-  if (!result.value) return
+  if (result.value === null) return
   const Iop = result.value
   const nonAct = (Iop * testConfig.nonActCoeff).toFixed(2)
   const act = (Iop * testConfig.actCoeff).toFixed(2)
@@ -159,12 +155,12 @@ function copyTestPlan() {
 日期：_________
 
 保护定值：
-- 启动电流 Iop = ${Iop.toFixed(2)} A
+- 启动电流 I_op = ${Iop.toFixed(2)} A
 
 校验参数：
-- 不动作系数：${testConfig.nonActCoeff} → 不动作值 = ${nonAct} A
-- 动作系数：${testConfig.actCoeff} → 动作值 = ${act} A
-- 超动系数：${testConfig.overActCoeff} → 超动值 = ${overAct} A
+- 不动作系数：${testConfig.nonActCoeff} -> 不动作值 = ${nonAct} A
+- 动作系数：${testConfig.actCoeff} -> 动作值 = ${act} A
+- 超动系数：${testConfig.overActCoeff} -> 超动值 = ${overAct} A
 - 加量保持时间：${holdTime} 秒
 
 校验步骤：
@@ -175,7 +171,7 @@ function copyTestPlan() {
 
 2. 动作试验：
    - 加量至 ${act} A
-   - 记录动作时间
+   - 记录动作时间 t1
    - 预期：保护动作，时间符合整定值
 
 3. 超动试验：
@@ -188,11 +184,9 @@ function copyTestPlan() {
   if (testConfig.directionalEnabled) {
     const revNonAct = (Iop * testConfig.revNonActCoeff).toFixed(2)
     const revHold = testConfig.revHoldTime
-    text += `方向保护校验：
-4. 反向不动作试验：
-   - 加量至 ${revNonAct} A
-   - 保持 ${revHold} 秒
-   - 预期：保护不动作
+    text += `方向过流（如启用）：
+- 正向故障：按上述流程
+- 反向故障：加量至 ${revNonAct} A 保护不应动作（保持 ${revHold} 秒）
 
 `
   }

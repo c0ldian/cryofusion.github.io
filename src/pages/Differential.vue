@@ -6,7 +6,7 @@
     <div class="bg-gray-900 rounded-xl shadow-lg p-4 md:p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-gray-200">主变参数</h2>
-        <button @click="fillExample" class="text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded border transition">填入示例</button>
+        <button @click="fillTransformerDefaults" class="text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded border transition">填入默认值</button>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -103,7 +103,7 @@
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-gray-200">差动保护整定</h2>
         <div class="flex gap-2">
-          <button @click="fillDefaults" class="text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded border transition">一键填入</button>
+          <button @click="fillCalcDefaults" class="text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded border transition">一键填入</button>
           <button @click="clearAll" class="text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded border transition">一键清空</button>
         </div>
       </div>
@@ -129,8 +129,8 @@
 
       <div class="mt-4 p-3 bg-gray-800 rounded text-sm">
         <p class="text-gray-400">判据：</p>
-        <p class="text-gray-300 font-mono">I<sub>res</sub> &lt; I<sub>break</sub>：I<sub>diff</sub> &gt; Id_min + k1×I<sub>res</sub></p>
-        <p class="text-gray-300 font-mono">I<sub>res</sub> ≥ I<sub>break</sub>：I<sub>diff</sub> &gt; Id_min + k2×(I<sub>res</sub>−I<sub>break</sub>)</p>
+        <p class="text-gray-300 font-mono">当 I_res < I_break 时：I_diff > Id_min + k1 * I_res</p>
+        <p class="text-gray-300 font-mono">当 I_res >= I_break 时：I_diff > Id_min + k2 * (I_res - I_break)</p>
       </div>
     </div>
 
@@ -140,7 +140,7 @@
         <h2 class="text-lg font-semibold text-gray-200">测试序列（高压侧单相加流）</h2>
       </div>
       <div class="mb-2 text-sm text-gray-300">
-        序列基于 I<sub>break</sub> 自动生成：0.5×I<sub>break</sub> → 3×I<sub>break</sub>，步长 0.5×I<sub>break</sub>
+        序列基于 I_break 自动生成：0.5 * I_break -> 3 * I_break，步长 0.5 * I_break
       </div>
       <div class="p-3 bg-blue-900/30 border border-blue-700/30 rounded font-mono text-blue-200">
         {{ testSequenceDisplay }}
@@ -151,7 +151,7 @@
     <div v-if="calcStore.results" class="bg-gray-900 rounded-xl shadow-lg p-4 md:p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-gray-200">校验结果</h2>
-        <button @click="copyTestPlan" class="text-sm bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded border transition">复制校验模板</button>
+        <button @click="copyTestPlan" :disabled="toast.show" class="text-sm bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded border transition disabled:opacity-50">复制校验模板</button>
       </div>
 
       <div class="overflow-x-auto mb-6">
@@ -159,9 +159,9 @@
           <thead class="bg-gray-800">
             <tr>
               <th class="px-4 py-3 text-left">序号</th>
-              <th class="px-4 py-3 text-left">I<sub>res</sub> (A)</th>
-              <th class="px-4 py-3 text-left">I<sub>diff</sub> (A)</th>
-              <th class="px-4 py-3 text-left">I<sub>diff</sub> 整定值 (A)</th>
+              <th class="px-4 py-3 text-left">I_res (A)</th>
+              <th class="px-4 py-3 text-left">I_diff (A)</th>
+              <th class="px-4 py-3 text-left">I_diff 整定值 (A)</th>
               <th class="px-4 py-3 text-left">动作</th>
               <th class="px-4 py-3 text-left">区域</th>
             </tr>
@@ -181,13 +181,10 @@
 
       <div class="p-3 bg-gray-800 rounded text-sm">
         <p class="text-gray-400 mb-1">折算系数说明：</p>
-        <p>HV→装置：K = 1.000</p>
-        <p>LV→装置：K = {{ calcStore.results.factors.lv.toFixed(4) }}</p>
+        <p>HV->装置：K = 1.000</p>
+        <p>LV->装置：K = {{ calcStore.results.factors.lv.toFixed(4) }}</p>
       </div>
     </div>
-
-    <!-- 特性曲线 -->
-    <DiffChart />
 
     <!-- 校验模板复制 -->
     <div v-if="calcStore.results" class="bg-gray-900 rounded-xl shadow-lg p-4 md:p-6">
@@ -219,7 +216,6 @@
 import { computed, ref } from 'vue'
 import { useTransformerStore } from '../store/transformerStore'
 import { useCalculationStore } from '../store/calculationStore'
-import { roundTo } from '../utils/unitConverter'
 
 const transformer = useTransformerStore()
 const calcStore = useCalculationStore()
@@ -228,16 +224,23 @@ const toast = ref({ show: false, message: '' })
 const deviceFactor = computed(() => transformer.params.deviceConfig === 'delta-to-wye' ? 1 / Math.sqrt(3) : Math.sqrt(3))
 
 const testSequenceDisplay = computed(() => {
-  return (calcStore.testCurrents || []).map(c => c.toFixed(2)).join(' A ｜ ')
+  return (calcStore.testCurrents || []).map(c => c.toFixed(2)).join(' A | ')
 })
 
-function fillExample() {
+function fillTransformerDefaults() {
   transformer.params.capacity = 50
-  transformer.params.voltages = { hv: 110, lv: 10 }
-  transformer.params.ctRatios = { hv: '600/5', lv: '1200/5' }
+  transformer.params.voltages = { hv: 110, lv: 10.5 }
+  transformer.params.ctRatios = { hv: '600/5', lv: '4000/5' }
   transformer.params.windingConnection = { hv: 'Y', lv: 'D' }
   transformer.params.clockNumbers = { hv: 0, lv: 11 }
   transformer.params.deviceConfig = 'delta-to-wye'
+}
+
+function fillCalcDefaults() {
+  calcStore.settings.Id_min = 0.5
+  calcStore.settings.I_break = 2
+  calcStore.settings.k1 = 0.5
+  calcStore.settings.k2 = 0.5
 }
 
 function clearAll() {
@@ -283,9 +286,9 @@ ${table.map((r, i) => `${i+1} | ${r.I_res.toFixed(2)} | ${r.I_diff.toFixed(2)} |
 
 校验步骤：
 1. 按 I_break 的 0.5~3 倍设置制动电流（高压侧）
-2. 每点先加至 0.95×I_res 检查不动作
+2. 每点先加至 0.95 * I_res 检查不动作
 3. 再加至测试点 I_diff，记录动作情况
-4. 通过标准：误差 ≤ ±5%
+4. 通过标准：误差 <= +-5%
 
 记录：
 □ 校验通过

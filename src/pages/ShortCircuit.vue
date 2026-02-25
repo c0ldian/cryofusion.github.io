@@ -36,11 +36,11 @@
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="p-4 bg-blue-900/50 border border-blue-700/30 rounded-xl">
-          <p class="text-gray-400 mb-1">三相短路电流 I<sub>k</sub></p>
+          <p class="text-gray-400 mb-1">三相短路电流 I_k</p>
           <p class="text-3xl font-bold text-blue-400">{{ result.ik.toFixed(3) }} <span class="text-lg">kA</span></p>
         </div>
         <div class="p-4 bg-blue-900/50 border border-blue-700/30 rounded-xl">
-          <p class="text-gray-400 mb-1">峰值电流 I<sub>p</sub></p>
+          <p class="text-gray-400 mb-1">峰值电流 I_p</p>
           <p class="text-3xl font-bold text-blue-400">{{ result.ip.toFixed(3) }} <span class="text-lg">kA</span></p>
         </div>
       </div>
@@ -51,12 +51,12 @@
       <div class="prose max-w-none text-gray-300">
         <p>短路电流计算基于标幺值法：</p>
         <p class="my-2 text-lg font-mono text-gray-200">
-          I<sub>k</sub> = S<sub>n</sub> / (√3 &middot; U<sub>n</sub> &middot; (u<sub>k</sub>/100))
+          I_k = S_n / (√3 * U_n * (u_k/100))
         </p>
         <ul class="list-disc ml-6 space-y-2">
-          <li><strong>S<sub>n</sub></strong>：系统短路容量 (MVA)</li>
-          <li><strong>U<sub>n</sub></strong>：系统额定电压 (kV)</li>
-          <li><strong>u<sub>k</sub></strong>：阻抗百分比 (%)</li>
+          <li><strong>S_n</strong>：系统短路容量 (MVA)</li>
+          <li><strong>U_n</strong>：系统额定电压 (kV)</li>
+          <li><strong>u_k</strong>：阻抗百分比 (%)</li>
         </ul>
         <p class="mt-4 text-gray-300">
           峰值电流取短路电流的 <strong>1.8 倍</strong>（适用于 50Hz 系统）。
@@ -66,10 +66,7 @@
 
     <!-- Toast 提示 -->
     <transition name="fade">
-      <div
-        v-if="toast.show"
-        class="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-lg z-50"
-      >
+      <div v-if="toast.show" class="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-lg z-50">
         {{ toast.message }}
       </div>
     </transition>
@@ -104,14 +101,12 @@ function calc() {
 }
 
 function copyResults() {
-  if (!result.value) return
+  if (result.value === null) return
   const text = `短路电流计算:\n三相短路电流 Ik = ${result.value.ik.toFixed(3)} kA\n峰值电流 Ip = ${result.value.ip.toFixed(3)} kA`
   navigator.clipboard.writeText(text).then(() => {
     toast.message = '已复制：短路电流结果'
     toast.show = true
-    setTimeout(() => {
-      toast.show = false
-    }, 2000)
+    setTimeout(() => { toast.show = false }, 2000)
   }).catch((err) => {
     console.error('复制失败:', err)
     alert('复制失败，请手动复制')

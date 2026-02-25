@@ -6,7 +6,7 @@
       <h2 class="text-lg font-semibold mb-4 text-gray-200">输入参数</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div v-for="field in fields" :key="field.key">
-          <label class="block text-sm font-medium mb-2 text-gray-300" v-html="field.label"></label>
+          <label class="block text-sm font-medium mb-2 text-gray-300">{{ field.label }}</label>
           <input
             type="number"
             v-model="form[field.key]"
@@ -38,7 +38,7 @@
       <h2 class="text-lg font-semibold mb-4 text-gray-200">计算原理</h2>
       <div class="prose max-w-none text-gray-300">
         <p>距离保护通过测量阻抗判断故障位置。当测量阻抗小于整定值时动作。</p>
-        <p class="my-2 text-lg font-mono text-gray-200">动作圆特性：|Z| ≤ Z<sub>n</sub></p>
+        <p class="my-2 text-lg font-mono text-gray-200">动作圆特性：|Z| <= Z_n</p>
       </div>
     </div>
 
@@ -59,8 +59,8 @@ const result = ref(null)
 const toast = reactive({ show: false, message: '' })
 
 const fields = [
-  { key: 'zn', label: '整定阻抗 Z<sub>n</sub> (Ω)' },
-  { key: 'zLine', label: '线路阻抗 Z<sub>line</sub> (Ω)' },
+  { key: 'zn', label: '整定阻抗 Z_n (Ω)' },
+  { key: 'zLine', label: '线路阻抗 Z_line (Ω)' },
 ]
 
 function calc() {

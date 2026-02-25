@@ -42,7 +42,7 @@
         </div>
         <div v-if="result.burden > 0" class="p-4 bg-green-900/30 border border-green-700/30 rounded-xl">
           <p class="text-gray-400 mb-1">建议二次负荷</p>
-          <p class="text-3xl font-bold text-green-400">≤ {{ result.burden }} VA</p>
+          <p class="text-3xl font-bold text-green-400"><= {{ result.burden }} VA</p>
         </div>
       </div>
     </div>
@@ -86,7 +86,7 @@ function calc() {
 
 function copyResults() {
   if (!result.value) return
-  const burdenText = result.value.burden > 0 ? `\n建议二次负荷 ≤ ${result.value.burden} VA` : ''
+  const burdenText = result.value.burden > 0 ? `\n建议二次负荷 <= ${result.value.burden} VA` : ''
   const text = `CT 变比计算:\n变比 = ${result.value.ratio}${burdenText}`
   navigator.clipboard.writeText(text).then(() => {
     toast.message = '已复制：CT 变比结果'

@@ -6,11 +6,11 @@
       <h2 class="text-lg font-semibold mb-4 text-gray-200">输入参数</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium mb-2 text-gray-300">最小短路电流 I<sub>min</sub> (A)</label>
+          <label class="block text-sm font-medium mb-2 text-gray-300">最小短路电流 I_min (A)</label>
           <input type="number" v-model="form.minShortCurrent" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
         </div>
         <div>
-          <label class="block text-sm font-medium mb-2 text-gray-300">保护整定值 I<sub>op</sub> (A)</label>
+          <label class="block text-sm font-medium mb-2 text-gray-300">保护整定值 I_op (A)</label>
           <input type="number" v-model="form.protectionSetting" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
         </div>
       </div>
@@ -23,7 +23,7 @@
         <button @click="copyResults" :disabled="toast.show" class="text-sm bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 rounded border border-gray-600 transition disabled:opacity-50">复制结果</button>
       </div>
       <div :class="['p-6 rounded-xl border', result >= 1.5 ? 'bg-green-900/30 border-green-700/30' : 'bg-red-900/30 border-red-700/30']">
-        <p class="text-gray-400 mb-2">灵敏度系数 K<sub>sen</sub></p>
+        <p class="text-gray-400 mb-2">灵敏度系数 K_sen</p>
         <p :class="['text-4xl font-bold', result >= 1.5 ? 'text-green-400' : 'text-red-400']">
           {{ result.toFixed(3) }}
           <span class="text-2xl ml-2">{{ result >= 1.5 ? '✓ 满足要求' : '✗ 不足' }}</span>
@@ -35,8 +35,8 @@
       <h2 class="text-lg font-semibold mb-4 text-gray-200">计算原理</h2>
       <div class="prose max-w-none text-gray-300">
         <p>灵敏度校验：最小短路电流与保护启动值之比。</p>
-        <p class="my-2 text-lg font-mono text-gray-200">K<sub>sen</sub> = I<sub>min</sub> / I<sub>op</sub></p>
-        <p>一般要求 K<sub>sen</sub> ≥ 1.5（过流保护）或满足规程最低灵敏度要求。</p>
+        <p class="my-2 text-lg font-mono text-gray-200">K_sen = I_min / I_op</p>
+        <p>一般要求 K_sen ≥ 1.5（过流保护）或满足规程最低灵敏度要求。</p>
       </div>
     </div>
 

@@ -6,7 +6,7 @@
       <h2 class="text-lg font-semibold mb-4 text-gray-200">输入参数</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div v-for="field in fields" :key="field.key">
-          <label class="block text-sm font-medium mb-2 text-gray-300" v-html="field.label"></label>
+          <label class="block text-sm font-medium mb-2 text-gray-300">{{ field.label }}</label>
           <input
             type="number"
             :step="field.step"
@@ -24,7 +24,7 @@
         <button @click="copyResults" :disabled="toast.show" class="text-sm bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 rounded border border-gray-600 transition disabled:opacity-50">复制结果</button>
       </div>
       <div class="p-6 bg-blue-900/50 border border-blue-700/30 rounded-xl text-center">
-        <p class="text-gray-400 mb-2">重合闸总动作时间 T<sub>out</sub></p>
+        <p class="text-gray-400 mb-2">重合闸总动作时间 T_out</p>
         <p class="text-4xl font-bold text-blue-400">{{ result.toFixed(2) }} <span class="text-2xl">s</span></p>
       </div>
     </div>
@@ -33,7 +33,7 @@
       <h2 class="text-lg font-semibold mb-4 text-gray-200">计算原理</h2>
       <div class="prose max-w-none text-gray-300">
         <p>自动重合闸时间整定为保护动作时间、断路器固有分闸时间加上安全裕度：</p>
-        <p class="my-2 text-lg font-mono text-gray-200">T<sub>out</sub> = T<sub>prot</sub> + T<sub>breaker</sub> + T<sub>margin</sub></p>
+        <p class="my-2 text-lg font-mono text-gray-200">T_out = T_prot + T_breaker + T_margin</p>
         <p>确保在故障清除后再重合。</p>
       </div>
     </div>
@@ -55,9 +55,9 @@ const result = ref(null)
 const toast = reactive({ show: false, message: '' })
 
 const fields = [
-  { key: 'protectionTripTime', label: '保护动作时间 T<sub>prot</sub> (s)', step: '0.01' },
-  { key: 'breakerTime', label: '断路器固有分闸时间 T<sub>breaker</sub> (s)', step: '0.01' },
-  { key: 'safetyMargin', label: '安全裕度 T<sub>margin</sub> (s)', step: '0.1' },
+  { key: 'protectionTripTime', label: '保护动作时间 T_prot (s)', step: '0.01' },
+  { key: 'breakerTime', label: '断路器固有分闸时间 T_breaker (s)', step: '0.01' },
+  { key: 'safetyMargin', label: '安全裕度 T_margin (s)', step: '0.1' },
 ]
 
 function calc() {
