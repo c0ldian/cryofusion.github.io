@@ -6,6 +6,9 @@ const collapsed = ref(false)
 const mobileOpen = ref(false)
 const route = useRoute()
 
+// 构建时间（注入）
+const buildTime = __BUILD_TIME__
+
 const navItems = [
   { name: 'short-circuit', label: '短路电流' },
   { name: 'over-current', label: '过流保护' },
@@ -32,9 +35,12 @@ function isActive(item) {
       class="fixed md:sticky top-0 left-0 z-50 h-screen w-64 bg-gray-900 border-r border-gray-800 transform transition-transform duration-300 md:translate-x-0 flex flex-col"
       :class="mobileOpen ? 'translate-x-0' : '-translate-x-full'"
     >
-      <div class="h-16 flex items-center justify-between px-4 border-b border-gray-800">
-        <h1 class="text-xl font-bold text-gray-100">继保计算器</h1>
-        <button class="md:hidden text-gray-400 hover:text-white" @click="mobileOpen=false">✕</button>
+      <div class="h-16 flex flex-col items-center justify-center px-4 border-b border-gray-800 relative">
+        <div class="flex items-center">
+          <h1 class="text-xl font-bold text-gray-100">继保计算器</h1>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">编译时间: {{ buildTime }}</p>
+        <button class="md:hidden absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white" @click="mobileOpen=false">✕</button>
       </div>
 
       <nav class="flex-1 overflow-y-auto py-4">

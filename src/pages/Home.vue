@@ -1,42 +1,45 @@
 <template>
   <div class="space-y-6">
-    <div>
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-100">继电保护计算器</h1>
-      <p class="text-gray-400 mt-2">选择计算模块开始使用</p>
+    <h1 class="text-3xl font-bold text-gray-100">欢迎使用继保计算器</h1>
+
+    <div class="bg-yellow-900/30 border border-yellow-700 rounded-xl p-6">
+      <h2 class="text-xl font-semibold text-yellow-400 mb-2">🚧 施工中公告</h2>
+      <p class="text-gray-300 mb-2">
+        本网站目前处于 <strong>持续开发与测试阶段</strong>。页面内容、计算逻辑、校验方案等可能会随时调整。
+      </p>
+      <p class="text-gray-300 mb-2">
+        如遇到计算异常、页面卡顿或显示错误，请及时反馈。你的使用帮助我发现问题、改进代码。
+      </p>
+      <p class="text-gray-300">
+        感谢耐心。完成后将提供更完整、更稳定的服务。
+      </p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <router-link
-        v-for="calc in calculators"
-        :key="calc.name"
-        :to="`/calculators/${calc.name}`"
-        class="group p-5 bg-gray-900 border border-gray-800 rounded-xl hover:border-blue-500 transition-all duration-200 hover:shadow-lg"
-      >
-        <div class="flex items-start gap-4">
-          <div class="flex-shrink-0 w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-lg">
-            •
-          </div>
-          <div>
-            <h2 class="text-lg font-semibold text-gray-100 group-hover:text-blue-400 transition">
-              {{ calc.label }}
-            </h2>
-            <p class="text-sm text-gray-400 mt-1">{{ calc.desc }}</p>
-          </div>
-        </div>
-      </router-link>
+    <div class="bg-gray-900 rounded-xl p-6">
+      <h2 class="text-xl font-semibold text-gray-200 mb-4">快速导航</h2>
+      <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <li v-for="item in navItems" :key="item.name">
+          <RouterLink :to="`/calculators/${item.name}`" class="block p-4 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-300 hover:text-white transition">
+            {{ item.label }}
+          </RouterLink>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
 
 <script setup>
-const calculators = [
-  { name: 'short-circuit', label: '短路电流', desc: '三相/两相短路电流、标幺值' },
-  { name: 'over-current', label: '过流保护', desc: '启动值、时间级差、灵敏度' },
-  { name: 'distance', label: '距离保护', desc: '阻抗圆、动作阻抗计算' },
-  { name: 'differential', label: '差动保护', desc: '不平衡电流计算' },
-  { name: 'ct-ratio', label: 'CT 变比', desc: '变比与准确级校验' },
-  { name: 'pt-ratio', label: 'PT 变比', desc: '电压互感器变比' },
-  { name: 'reclose-time', label: '重合闸时间', desc: '时间整定与配合' },
-  { name: 'sensitivity', label: '灵敏度校验', desc: '灵敏系数计算' },
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const navItems = [
+  { name: 'short-circuit', label: '短路电流' },
+  { name: 'over-current', label: '过流保护' },
+  { name: 'distance', label: '距离保护' },
+  { name: 'differential', label: '差动保护' },
+  { name: 'ct-ratio', label: 'CT 变比' },
+  { name: 'pt-ratio', label: 'PT 变比' },
+  { name: 'reclose-time', label: '重合闸时间' },
+  { name: 'sensitivity', label: '灵敏度校验' },
 ]
 </script>
