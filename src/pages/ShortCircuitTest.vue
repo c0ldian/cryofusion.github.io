@@ -175,33 +175,32 @@ function runCalculation() {
     const nCTH = parseCTRatio(params.nCTH_str)
     const nCTL = parseCTRatio(params.nCTL_str)
 
-    // 1. 高压侧一次额定电流
+    // 1. 高压侧一次额定电流 I_H_rated = S / (√3 × U_H)
     const Sn = params.Sn_MVA * 1e6
     const I_H_1st_rated = Sn / (Math.sqrt(3) * params.UH_kV * 1e3)
 
     // 2. 短路阻抗标幺值
     const Zk_pu = testSettings.zk_percent / 100
 
-    // 3. 高压侧二次额定电压（通常 100V 或 110V，按标准取 100V）
+    // 3. 高压侧二次额定电压（线电压，固定 100V）
     const U_H_2nd_rated = 100 // V
 
-    // 4. 试验时高压侧一次电流（按用户公式）
-    // I_H_test_1st = I_H_1st_rated / Zk_pu * (U_test / U_H_2nd_rated)
+    // 4. 试验时高压侧一次电流
+    // I_H_test_1st = I_H_1st_rated / Zk_pu × (U_test / U_H_2nd_rated)
     const I_H_test_1st = I_H_1st_rated / Zk_pu * (testSettings.testVoltage_V / U_H_2nd_rated)
 
     // 5. 高压侧二次试验电流
     const I_H_test_2nd = I_H_test_1st / nCTH
 
-    // 6. 变比（一次电压比）
+    // 6. 低压侧一次试验电流（通过电压变比换算）
+    // I_L_test_1st = I_H_test_1st × (U_H / U_L)
     const ratio_voltage = params.UH_kV / params.UL_kV
-
-    // 7. 低压侧一次试验电流（高压侧电流 × 电压比）
     const I_L_test_1st = I_H_test_1st * ratio_voltage
 
-    // 8. 低压侧二次试验电流
+    // 7. 低压侧二次试验电流
     const I_L_test_2nd = I_L_test_1st / nCTL
 
-    // 8b. 也计算低压侧一次额定电流（参考）
+    // 8. 低压侧一次额定电流（参考）
     const I_L_1st_rated = Sn / (Math.sqrt(3) * params.UL_kV * 1e3)
 
     results.value = {

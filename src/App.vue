@@ -11,7 +11,7 @@ const buildTime = __BUILD_TIME__
 
 const navItems = [
   { name: 'short-circuit', label: '短路试验计算' },
-  { name: 'short-circuit-current', label: '短路电流' },
+  { name: 'short-circuit-current', label: '短路电流计算' },
   { name: 'over-current', label: '过流保护' },
   { name: 'distance', label: '距离保护' },
   { name: 'differential', label: '差动保护' },
