@@ -10,7 +10,8 @@ const route = useRoute()
 const buildTime = __BUILD_TIME__
 
 const navItems = [
-  { name: 'short-circuit', label: '短路电流' },
+  { name: 'short-circuit', label: '短路试验计算' },
+  { name: 'short-circuit-current', label: '短路电流' },
   { name: 'over-current', label: '过流保护' },
   { name: 'distance', label: '距离保护' },
   { name: 'differential', label: '差动保护' },
@@ -21,7 +22,14 @@ const navItems = [
 ]
 
 function isActive(item) {
-  return route.path.endsWith(`/calculators/${item.name}`) || (route.path === '/' && item.name === 'short-circuit')
+  const path = route.path
+  // 匹配主路径
+  if (path === `/calculators/${item.name}`) return true
+  // 匹配子页面（如 distance/*）
+  if (path.startsWith(`/calculators/${item.name}/`)) return true
+  // 首页匹配
+  if (path === '/' && item.name === 'short-circuit') return true
+  return false
 }
 </script>
 

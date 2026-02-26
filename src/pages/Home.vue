@@ -34,10 +34,9 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const navItems = [
   { name: 'short-circuit', label: '短路试验计算' },
-  { name: 'short-circuit-current', label: '短路电流' },
-  { name: 'over-current', label: '过流保护' },
   { name: 'distance', label: '距离保护' },
   { name: 'differential', label: '差动保护' },
+  { name: 'over-current', label: '过流保护' },
   { name: 'ct-ratio', label: 'CT 变比' },
   { name: 'pt-ratio', label: 'PT 变比' },
   { name: 'reclose-time', label: '重合闸时间' },
