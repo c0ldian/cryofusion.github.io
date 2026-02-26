@@ -305,7 +305,7 @@
 <script setup>
 import { computed, ref, reactive } from 'vue'
 import { useTransformerStore } from '../store/transformerStore'
-import { calcDifferentialTest } from '../calc/differentialEngine'
+import { calcDifferentialTest, calcRatedCurrents } from '../calc/differentialEngine'
 
 const transformer = useTransformerStore()
 const toast = ref({ show: false, message: '' })
@@ -350,7 +350,7 @@ const ratedCurrents = computed(() => {
   const nCTH = parseCTRatio(params.nCTH_str)
   const nCTL = parseCTRatio(params.nCTL_str)
   if (!nCTH || !nCTL) return { I_H_2nd: 0, I_L_2nd: 0 }
-  return calcRatedCurrentsSimple(params.Sn_MVA, params.UH_kV, params.UL_kV, nCTH, nCTL)
+  return calcRatedCurrents(params.Sn_MVA, params.UH_kV, params.UL_kV, nCTH, nCTL)
 })
 
 const thetaGroupDeg = computed(() => {
@@ -383,16 +383,6 @@ function parseCTRatio(str) {
   const m = String(str).trim().match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/)
   if (!m) return null
   return parseFloat(m[1]) / parseFloat(m[2])
-}
-
-function calcRatedCurrentsSimple(Sn, UH, UL, nCTH, nCTL) {
-  const SnW = Sn * 1e6
-  const IH1 = SnW / (Math.sqrt(3) * UH * 1e3)
-  const IL1 = SnW / (Math.sqrt(3) * UL * 1e3)
-  return {
-    I_H_2nd: roundTo(IH1 / nCTH, 4),
-    I_L_2nd: roundTo(IL1 / nCTL, 4)
-  }
 }
 
 function fillTransformerDefaults() {
