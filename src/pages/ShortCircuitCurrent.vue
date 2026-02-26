@@ -1,6 +1,9 @@
 <template>
   <div class="space-y-6">
-    <h1 class="text-2xl md:text-3xl font-bold text-gray-100">短路电流计算</h1>
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-100">短路电流计算</h1>
+      <RouterLink to="/" class="text-sm bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded transition">返回主页</RouterLink>
+    </div>
 
     <!-- 系统参数 -->
     <div class="bg-gray-900 rounded-xl shadow-lg p-4 md:p-6">
@@ -103,10 +106,10 @@
 
       <div class="p-4 bg-gray-800 rounded text-sm">
         <p class="text-gray-400 mb-1">计算公式</p>
-        <p class="text-gray-300 font-mono">Z_sys = U² / S_sc</p>
-        <p class="text-gray-300 font-mono">Z_tr = (U / (√3 × I_n)) × (Zk% / 100)</p>
-        <p class="text-gray-300 font-mono">Z_line = (R + jX) × L</p>
-        <p class="text-gray-300 font-mono">I_sc = U / (√3 × Z_total)</p>
+        <p class="text-gray-300 font-mono">$Z_{\text{sys}} = U^2 / S_{\text{sc}}$</p>
+        <p class="text-gray-300 font-mono">$Z_{\text{tr}} = \frac{U}{\sqrt{3} \times I_n} \times \frac{Z_{\text{k}}\%}{100}$</p>
+        <p class="text-gray-300 font-mono">$Z_{\text{line}} = (R + jX) \times L$</p>
+        <p class="text-gray-300 font-mono">$I_{\text{sc}} = \frac{U}{\sqrt{3} \times Z_{\text{total}}}$</p>
       </div>
     </div>
 

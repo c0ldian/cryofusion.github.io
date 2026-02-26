@@ -137,8 +137,8 @@
 
       <div class="mt-4 p-3 bg-gray-800 rounded text-sm">
         <p class="text-gray-400">判据（标幺值）：</p>
-        <p class="text-gray-300 font-mono">Ir ≤ Ir_break: Id_th = Id_min + K1 × Ir</p>
-        <p class="text-gray-300 font-mono">Ir > Ir_break: Id_th = Id_min + K1×Ir_break + K2 × (Ir - Ir_break)</p>
+        <p class="text-gray-300 font-mono">$I_r \le I_{r,\text{break}}: I_{d,\text{th}} = I_{d,\text{min}} + K_1 \times I_r$</p>
+        <p class="text-gray-300 font-mono">$I_r > I_{r,\text{break}}: I_{d,\text{th}} = I_{d,\text{min}} + K_1 \times I_{r,\text{break}} + K_2 \times (I_r - I_{r,\text{break}})$</p>
       </div>
     </div>
 

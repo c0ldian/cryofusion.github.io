@@ -111,13 +111,13 @@
 
       <div class="mt-4 p-4 bg-gray-800 rounded text-sm">
         <p class="text-gray-400 mb-1">计算公式</p>
-        <p class="text-gray-300 font-mono">I_H_rated = S / (√3 × U_H)</p>
-        <p class="text-gray-300 font-mono">Z_k(p.u.) = (短路阻抗%) / 100</p>
-        <p class="text-gray-300 font-mono">I_H_test_1st = I_H_rated × (U_test / U_H) / Z_k</p>
-        <p class="text-gray-300 font-mono">I_H_test_2nd = I_H_test_1st / nCT_H</p>
-        <p class="text-gray-300 font-mono">U_H_test_2nd = U_test / nPT</p>
-        <p class="text-gray-300 font-mono">I_L_test_1st = I_H_test_1st × (U_H / U_L)</p>
-        <p class="text-gray-300 font-mono">I_L_test_2nd = I_L_test_1st / nCT_L</p>
+        <p class="text-gray-300 font-mono">$I_{H,\text{rated}} = \frac{S}{\sqrt{3} \times U_H}$</p>
+        <p class="text-gray-300 font-mono">$Z_k(\text{p.u.}) = \frac{\text{短路阻抗}\%}{100}$</p>
+        <p class="text-gray-300 font-mono">$I_{H,\text{test},1\text{st}} = I_{H,\text{rated}} \times \frac{U_{\text{test}}}{U_H} \div Z_k$</p>
+        <p class="text-gray-300 font-mono">$I_{H,\text{test},2\text{nd}} = I_{H,\text{test},1\text{st}} \div n_{\text{CT-H}}$</p>
+        <p class="text-gray-300 font-mono">$U_{H,\text{test},2\text{nd}} = U_{\text{test}} \div n_{\text{PT}}$</p>
+        <p class="text-gray-300 font-mono">$I_{L,\text{test},1\text{st}} = I_{H,\text{test},1\text{st}} \times \frac{U_H}{U_L}$</p>
+        <p class="text-gray-300 font-mono">$I_{L,\text{test},2\text{nd}} = I_{L,\text{test},1\text{st}} \div n_{\text{CT-L}}$</p>
       </div>
     </div>
 
