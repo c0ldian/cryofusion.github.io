@@ -169,7 +169,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
-import { calcDirectionalDistance } from '@/calc/distanceEngine.js'
+import { calcDirectionalDistance } from '../../calc/distanceEngine.js'
 
 const system = reactive({
   Un_kV: 110,

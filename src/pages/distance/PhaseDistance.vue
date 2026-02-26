@@ -161,7 +161,7 @@
 
 <script setup>
 import { reactive, ref, computed } from 'vue'
-import { calcPhaseFault } from '@/calc/distanceEngine.js'
+import { calcPhaseFault } from '../../calc/distanceEngine.js'
 
 const system = reactive({
   Un_kV: 110,
