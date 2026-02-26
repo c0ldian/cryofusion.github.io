@@ -416,37 +416,57 @@ function clearAll() {
 }
 
 function runValidation() {
-  if (errors.value.length > 0) {
+  console.log('runValidation called')
+  if (!errors.value || errors.value.length === 0) {
+    calculating.value = true
+    try {
+      const nCTH = parseCTRatio(params.nCTH_str)
+      const nCTL = parseCTRatio(params.nCTL_str)
+
+      console.log('Calling calcDifferentialTest with:', {
+        Sn_MVA: params.Sn_MVA,
+        UH_kV: params.UH_kV,
+        UL_kV: params.UL_kV,
+        groupStr: params.groupStr,
+        nCTH, nCTL,
+        Id_min_pu: settings.Id_min,
+        K1: settings.K1,
+        K2: settings.K2,
+        Ir_break_pu: settings.Ir_break,
+        Ir_mode: params.Ir_mode,
+        compDir: params.compDir,
+        injectMode: config.injectMode,
+        ctChannels: config.ctChannels
+      })
+
+      const result = calcDifferentialTest({
+        Sn_MVA: params.Sn_MVA,
+        UH_kV: params.UH_kV,
+        UL_kV: params.UL_kV,
+        groupStr: params.groupStr,
+        nCTH,
+        nCTL,
+        Id_min_pu: settings.Id_min,
+        K1: settings.K1,
+        K2: settings.K2,
+        Ir_break_pu: settings.Ir_break,
+        Ir_mode: params.Ir_mode,
+        compDir: params.compDir,
+        injectMode: config.injectMode,
+        ctChannels: config.ctChannels
+      })
+
+      console.log('calcDifferentialTest result:', result)
+      results.value = result
+      showDebugModal.value = false
+    } catch (e) {
+      console.error('calcDifferentialTest error:', e)
+      alert('计算失败：' + e.message)
+    } finally {
+      calculating.value = false
+    }
+  } else {
     alert('请先填写完整参数：' + errors.value.join('，'))
-    return
-  }
-
-  calculating.value = true
-  try {
-    const nCTH = parseCTRatio(params.nCTH_str)
-    const nCTL = parseCTRatio(params.nCTL_str)
-
-    const result = calcDifferentialTest({
-      Sn_MVA: params.Sn_MVA,
-      UH_kV: params.UH_kV,
-      UL_kV: params.UL_kV,
-      groupStr: params.groupStr,
-      nCTH,
-      nCTL,
-      Id_min_pu: settings.Id_min,
-      K1: settings.K1,
-      K2: settings.K2,
-      Ir_break_pu: settings.Ir_break,
-      Ir_mode: params.Ir_mode,
-      compDir: params.compDir,
-      injectMode: config.injectMode,
-      ctChannels: config.ctChannels
-    })
-
-    results.value = result
-    showDebugModal.value = false
-  } finally {
-    calculating.value = false
   }
 }
 
