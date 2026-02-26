@@ -312,6 +312,7 @@ const toast = ref({ show: false, message: '' })
 const showDebugModal = ref(false)
 const results = ref(null)
 const debugInstructions = ref(null)
+const calculating = ref(false)
 
 // UI参数（从 transformer store 拆分）
 const params = reactive({
@@ -420,28 +421,33 @@ function runValidation() {
     return
   }
 
-  const nCTH = parseCTRatio(params.nCTH_str)
-  const nCTL = parseCTRatio(params.nCTL_str)
+  calculating.value = true
+  try {
+    const nCTH = parseCTRatio(params.nCTH_str)
+    const nCTL = parseCTRatio(params.nCTL_str)
 
-  const result = calcDifferentialTest({
-    Sn_MVA: params.Sn_MVA,
-    UH_kV: params.UH_kV,
-    UL_kV: params.UL_kV,
-    groupStr: params.groupStr,
-    nCTH,
-    nCTL,
-    Id_min_pu: settings.Id_min,
-    K1: settings.K1,
-    K2: settings.K2,
-    Ir_break_pu: settings.Ir_break,
-    Ir_mode: params.Ir_mode,
-    compDir: params.compDir,
-    injectMode: config.injectMode,
-    ctChannels: config.ctChannels
-  })
+    const result = calcDifferentialTest({
+      Sn_MVA: params.Sn_MVA,
+      UH_kV: params.UH_kV,
+      UL_kV: params.UL_kV,
+      groupStr: params.groupStr,
+      nCTH,
+      nCTL,
+      Id_min_pu: settings.Id_min,
+      K1: settings.K1,
+      K2: settings.K2,
+      Ir_break_pu: settings.Ir_break,
+      Ir_mode: params.Ir_mode,
+      compDir: params.compDir,
+      injectMode: config.injectMode,
+      ctChannels: config.ctChannels
+    })
 
-  results.value = result
-  showDebugModal.value = false
+    results.value = result
+    showDebugModal.value = false
+  } finally {
+    calculating.value = false
+  }
 }
 
 function autoGenerateSequence() {
