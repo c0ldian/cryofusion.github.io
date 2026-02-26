@@ -5,7 +5,16 @@
 
 import { Complex } from './vectorMath.js'
 import { getPhaseShiftRad } from './ctModel.js'
-import { roundTo, radToDeg } from '../utils/unitConverter.js'
+
+// 本地工具：避免模块依赖问题
+function roundTo(value, digits) {
+  if (value === null || value === undefined) return null
+  const factor = Math.pow(10, digits)
+  return Math.round(value * factor) / factor
+}
+function radToDeg(rad) {
+  return rad * (180 / Math.PI)
+}
 
 // ─── 复数运算辅助 ────────────────────────────────────────────────
 function cpx(re, im = 0) {
