@@ -1,6 +1,9 @@
 <template>
   <div class="space-y-6">
-    <h1 class="text-2xl md:text-3xl font-bold text-gray-100">主变短路试验计算</h1>
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-100">主变短路试验计算</h1>
+      <RouterLink to="/" class="text-sm bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded transition">返回主页</RouterLink>
+    </div>
 
     <!-- 主变参数 -->
     <div class="bg-gray-900 rounded-xl shadow-lg p-4 md:p-6">
@@ -39,9 +42,14 @@
           <p class="text-xs text-gray-500 mt-1">如 13.92（%）</p>
         </div>
         <div>
-          <label class="block text-sm font-medium mb-2 text-gray-300">试验电压 (V)</label>
-          <input type="number" step="1" v-model.number="testSettings.testVoltage_V" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
-          <p class="text-xs text-gray-500 mt-1">高压侧通入的二次电压，如 380V</p>
+          <label class="block text-sm font-medium mb-2 text-gray-300">试验电压（一次） (kV)</label>
+          <input type="number" step="0.1" v-model.number="testSettings.testVoltage_kV" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
+          <p class="text-xs text-gray-500 mt-1">高压侧通入的一次电压（如 3kV, 5kV）</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2 text-gray-300">PT变比</label>
+          <input type="text" placeholder="如 1000/100" v-model="params.nPT_str" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-100" />
+          <p class="text-xs text-gray-500 mt-1">电压互感器变比，用于计算保护二次电压</p>
         </div>
       </div>
     </div>
@@ -77,6 +85,10 @@
           <p class="text-2xl font-mono text-blue-400">{{ results.I_H_test_2nd.toFixed(4) }} A</p>
         </div>
         <div class="p-4 bg-gray-800 rounded">
+          <p class="text-gray-400 mb-1">试验高压侧二次电压</p>
+          <p class="text-2xl font-mono text-blue-400">{{ results.U_H_test_2nd.toFixed(2) }} V</p>
+        </div>
+        <div class="p-4 bg-gray-800 rounded">
           <p class="text-gray-400 mb-1">试验低压侧一次电流</p>
           <p class="text-2xl font-mono text-blue-400">{{ results.I_L_test_1st.toFixed(4) }} A</p>
         </div>
@@ -89,19 +101,21 @@
       <div class="p-4 bg-gray-800 rounded text-sm">
         <p class="text-gray-400 mb-1">试验接线说明</p>
         <ul class="list-disc pl-5 space-y-1 text-gray-300">
-          <li>高压侧套管 CT 上端为电压输入点（通入 {{ testSettings.testVoltage_V }}V 二次电压）</li>
-          <li>10kV I 段母线压变柜母线接地</li>
-          <li>主变中性点闸刀分开（断开）</li>
-          <li>短路阻抗试验时，低压侧需短接（可通过低压侧套管 CT 二次短接实现）</li>
+          <li>高压侧通入一次电压：{{ testSettings.testVoltage_kV }} kV</li>
+          <li>保护电压二次值：{{ results.U_H_test_2nd.toFixed(1) }} V（线电压）</li>
+          <li>高压侧套管 CT 二次电流：{{ results.I_H_test_2nd.toFixed(4) }} A</li>
+          <li>低压侧套管 CT 二次电流：{{ results.I_L_test_2nd.toFixed(4) }} A</li>
+          <li>主变中性点闸刀分开，低压侧短接（或通过套管 CT 二次短接）</li>
         </ul>
       </div>
 
       <div class="mt-4 p-4 bg-gray-800 rounded text-sm">
         <p class="text-gray-400 mb-1">计算公式</p>
         <p class="text-gray-300 font-mono">I_H_rated = S / (√3 × U_H)</p>
-        <p class="text-gray-300 font-mono">Z_k (p.u.) = (短路阻抗%) / 100</p>
-        <p class="text-gray-300 font-mono">I_H_test_1st = I_H_rated × (U_test / U_H_2nd) / Z_k</p>
+        <p class="text-gray-300 font-mono">Z_k(p.u.) = (短路阻抗%) / 100</p>
+        <p class="text-gray-300 font-mono">I_H_test_1st = I_H_rated × (U_test / U_H) / Z_k</p>
         <p class="text-gray-300 font-mono">I_H_test_2nd = I_H_test_1st / nCT_H</p>
+        <p class="text-gray-300 font-mono">U_H_test_2nd = U_test / nPT</p>
         <p class="text-gray-300 font-mono">I_L_test_1st = I_H_test_1st × (U_H / U_L)</p>
         <p class="text-gray-300 font-mono">I_L_test_2nd = I_L_test_1st / nCT_L</p>
       </div>
@@ -118,19 +132,21 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref } from 'vue'
+import {RouterLink} from 'vue-router'
 
 const params = reactive({
   Sn_MVA: 50,
   UH_kV: 110,
   UL_kV: 10.5,
   nCTH_str: '600/5',
-  nCTL_str: '4000/5'
+  nCTL_str: '4000/5',
+  nPT_str: '1000/100' // PT变比，默认1000/100
 })
 
 const testSettings = reactive({
   zk_percent: 13.92,
-  testVoltage_V: 380
+  testVoltage_kV: 3.0 // 一次电压，默认3kV
 })
 
 const calculating = ref(false)
@@ -157,10 +173,12 @@ function validate() {
   if (!params.UL_kV || params.UL_kV <= 0) errs.push('低压侧电压必须大于 0')
   const nCTH = parseCTRatio(params.nCTH_str)
   const nCTL = parseCTRatio(params.nCTL_str)
+  const nPT = parseCTRatio(params.nPT_str)
   if (!nCTH) errs.push('高压侧 CT 变比错误')
   if (!nCTL) errs.push('低压侧 CT 变比错误')
+  if (!nPT) errs.push('PT 变比错误')
   if (!testSettings.zk_percent || testSettings.zk_percent <= 0) errs.push('短路阻抗必须大于 0')
-  if (!testSettings.testVoltage_V || testSettings.testVoltage_V <= 0) errs.push('试验电压必须大于 0')
+  if (!testSettings.testVoltage_kV || testSettings.testVoltage_kV <= 0) errs.push('试验电压必须大于 0')
   errors.value = errs
   return errs.length === 0
 }
@@ -174,6 +192,7 @@ function runCalculation() {
   try {
     const nCTH = parseCTRatio(params.nCTH_str)
     const nCTL = parseCTRatio(params.nCTL_str)
+    const nPT = parseCTRatio(params.nPT_str)
 
     // 1. 高压侧一次额定电流 I_H_rated = S / (√3 × U_H)
     const Sn = params.Sn_MVA * 1e6
@@ -182,25 +201,28 @@ function runCalculation() {
     // 2. 短路阻抗标幺值
     const Zk_pu = testSettings.zk_percent / 100
 
-    // 3. 高压侧二次额定电压（线电压，固定 100V）
-    const U_H_2nd_rated = 100 // V
+    // 3. 试验电压为一次电压（kV），转为 V
+    const U_test_1st = testSettings.testVoltage_kV * 1e3
+    const U_H_1st_rated = params.UH_kV * 1e3
 
-    // 4. 试验时高压侧一次电流
-    // I_H_test_1st = I_H_1st_rated / Zk_pu × (U_test / U_H_2nd_rated)
-    const I_H_test_1st = I_H_1st_rated / Zk_pu * (testSettings.testVoltage_V / U_H_2nd_rated)
+    // 4. 试验时高压侧一次电流（按比例）
+    // I_H_test_1st = I_H_1st_rated / Zk_pu × (U_test / U_H_rated)
+    const I_H_test_1st = I_H_1st_rated / Zk_pu * (U_test_1st / U_H_1st_rated)
 
     // 5. 高压侧二次试验电流
     const I_H_test_2nd = I_H_test_1st / nCTH
 
-    // 6. 低压侧一次试验电流（通过电压变比换算）
-    // I_L_test_1st = I_H_test_1st × (U_H / U_L)
+    // 6. 保护装置感受到的二次电压（线电压）
+    const U_H_test_2nd = U_test_1st / nPT // V
+
+    // 7. 低压侧一次试验电流（通过电压变比换算）
     const ratio_voltage = params.UH_kV / params.UL_kV
     const I_L_test_1st = I_H_test_1st * ratio_voltage
 
-    // 7. 低压侧二次试验电流
+    // 8. 低压侧二次试验电流
     const I_L_test_2nd = I_L_test_1st / nCTL
 
-    // 8. 低压侧一次额定电流（参考）
+    // 9. 低压侧一次额定电流（参考）
     const I_L_1st_rated = Sn / (Math.sqrt(3) * params.UL_kV * 1e3)
 
     results.value = {
@@ -208,10 +230,11 @@ function runCalculation() {
       I_L_1st_rated: roundTo(I_L_1st_rated, 4),
       I_H_test_1st: roundTo(I_H_test_1st, 4),
       I_H_test_2nd: roundTo(I_H_test_2nd, 4),
+      U_H_test_2nd: roundTo(U_H_test_2nd, 4),
       I_L_test_1st: roundTo(I_L_test_1st, 4),
       I_L_test_2nd: roundTo(I_L_test_2nd, 4),
       Zk_percent: testSettings.zk_percent,
-      testVoltage_V: testSettings.testVoltage_V
+      testVoltage_kV: testSettings.testVoltage_kV
     }
   } finally {
     calculating.value = false
@@ -225,22 +248,23 @@ function copyResults() {
     '【主变短路试验方案】',
     `主变：${params.Sn_MVA} MVA, ${params.UH_kV}kV/${params.UL_kV}kV`,
     `CT变比：高压 ${params.nCTH_str}，低压 ${params.nCTL_str}`,
+    `PT变比：${params.nPT_str}`,
     `短路阻抗：${testSettings.zk_percent}%`,
-    `试验电压：${testSettings.testVoltage_V} V（高压侧二次）`,
+    `试验电压：${testSettings.testVoltage_kV} kV（高压侧一次）`,
     '',
     '计算结果：',
     `- 高压侧一次额定电流：${r.I_H_1st_rated.toFixed(2)} A`,
     `- 低压侧一次额定电流：${r.I_L_1st_rated.toFixed(2)} A`,
     `- 试验高压侧一次电流：${r.I_H_test_1st.toFixed(4)} A`,
     `- 试验高压侧二次电流：${r.I_H_test_2nd.toFixed(4)} A`,
+    `- 保护电压二次值：${r.U_H_test_2nd.toFixed(1)} V（线电压）`,
     `- 试验低压侧一次电流：${r.I_L_test_1st.toFixed(4)} A`,
     `- 试验低压侧二次电流：${r.I_L_test_2nd.toFixed(4)} A`,
     '',
-    '试验接线与 precautions：',
-    '- 高压侧套管 CT 上端为 380V 电压输入点',
-    '- 10kV I 段母线压变柜母线接地',
+    '试验接线与注意事项：',
+    '- 高压侧通入一次电压，保证保护装置感受到二次电压在额定范围内',
     '- 主变中性点闸刀分开',
-    '- 低压侧需短接（可通过套管 CT 二次短接）',
+    '- 低压侧短接（可通过套管 CT 二次短接）',
     '- 试验时监测各侧电流，确保不超过 CT 和绕组承受能力'
   ]
   navigator.clipboard.writeText(lines.join('\n')).then(() => {
