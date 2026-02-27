@@ -17,8 +17,24 @@ export class Complex {
     return new Complex(r, i)
   }
 
+  sub(other) {
+    return new Complex(this.real - other.real, this.imag - other.imag)
+  }
+
+  divide(other) {
+    const denom = other.real * other.real + other.imag * other.imag
+    return new Complex(
+      (this.real * other.real + this.imag * other.imag) / denom,
+      (this.imag * other.real - this.real * other.imag) / denom
+    )
+  }
+
   abs() {
     return Math.sqrt(this.real * this.real + this.imag * this.imag)
+  }
+
+  arg() {
+    return Math.atan2(this.imag, this.real)
   }
 
   // 旋转 deg 角度（顺时针为正）

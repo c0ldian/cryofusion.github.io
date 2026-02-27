@@ -153,6 +153,15 @@
         </table>
       </div>
 
+
+      <div class="mb-4 p-4 bg-gray-800 rounded text-sm" v-if="result.relay_tester_shot">
+        <p class="text-gray-300 font-semibold mb-2">继保调试仪建议参数（方向校验）</p>
+        <p class="text-gray-400 mb-2">频率 {{ result.relay_tester_shot.frequency_hz }} Hz，故障前保持 {{ result.relay_tester_shot.prefault_hold_s }} s，故障保持 {{ result.relay_tester_shot.fault_hold_s }} s</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div v-for="ch in result.relay_tester_shot.channels" :key="ch.number" class="text-gray-300 font-mono">{{ ch.number }} = {{ ch.magnitude.toFixed(3) }} {{ ch.unit }} ∠{{ ch.angle_deg.toFixed(2) }}°</div>
+        </div>
+      </div>
+
       <div class="p-4 bg-gray-800 rounded text-sm">
         <p class="text-gray-400 mb-1">调试台接线与测试要点：</p>
         <ul class="list-disc pl-5 space-y-1 text-gray-300 marker:text-green-400">
@@ -199,6 +208,14 @@ const calculating = ref(false)
 const result = ref(null)
 
 function runValidation() {
+  if (!system.Un_kV || !system.nCT || !system.nPT || measurement.L_km <= 0) {
+    alert('请先填写完整且有效的系统参数')
+    return
+  }
+
+  const d_km = Math.min(Math.max(Number(measurement.d_km) || 0, 0), Number(measurement.L_km))
+  measurement.d_km = d_km
+
   calculating.value = true
   try {
     const res = calcDirectionalDistance({
@@ -209,7 +226,7 @@ function runValidation() {
       X1_per_km: system.X1_per_km,
       RS: system.RS,
       XS: system.XS,
-      d_km: measurement.d_km,
+      d_km,
       Rf: measurement.Rf,
       fault_type: measurement.fault_type,
       Zset_ohm: settings.Zset_ohm,
@@ -229,6 +246,7 @@ function copyResults() {
   const lines = [
     '方向距离校验结果',
     `测量阻抗 Zm = ${r.Zm_ohm.toFixed(4)} Ω, 角度 = ${r.Zm_angle_deg.toFixed(2)}°`,
+    `测量阻抗复数 = ${r.Zm_complex_re?.toFixed?.(4) ?? '-'} + j${r.Zm_complex_im?.toFixed?.(4) ?? '-'} Ω`,
     `定值 Z_set = ${r.Zset_ohm.toFixed(4)} Ω, 灵敏角 = ${r.theta_sens_deg}°, 偏移 = ${r.K_offset}`,
     `方向圆内: ${r.in_circle}, 角度窗口: ${r.in_angle_window}`,
     `动作: ${r.trip ? '是' : '否'}, 时间: ${r.t_action_s !== null ? r.t_action_s.toFixed(3) : '-'} s`,
@@ -237,6 +255,11 @@ function copyResults() {
     `U_B = ${r.U_B_V.toFixed(1)} V (${r.phi_U_B_deg.toFixed(1)}°), I_B = ${r.I_B_A.toFixed(2)} A (${r.phi_I_B_deg.toFixed(1)}°)`,
     `U_C = ${r.U_C_V.toFixed(1)} V (${r.phi_U_C_deg.toFixed(1)}°), I_C = ${r.I_C_A.toFixed(2)} A (${r.phi_I_C_deg.toFixed(1)}°)`,
   ]
+  if (r.relay_tester_shot) {
+    lines.push(`调试仪参数: f=${r.relay_tester_shot.frequency_hz}Hz, 故障前保持=${r.relay_tester_shot.prefault_hold_s}s, 故障保持=${r.relay_tester_shot.fault_hold_s}s, 预期动作时间=${r.relay_tester_shot.expected_trip_time_s ?? '-'}s`)
+    r.relay_tester_shot.channels.forEach(ch => lines.push(`${ch.number}=${ch.magnitude.toFixed(3)}${ch.unit} ∠${ch.angle_deg.toFixed(2)}°`))
+  }
+
   navigator.clipboard.writeText(lines.join('\n')).then(() => {
     alert('结果已复制')
   }).catch(() => alert('复制失败'))

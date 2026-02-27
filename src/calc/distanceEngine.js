@@ -60,6 +60,32 @@ function complex(re = 0, im = 0) {
   return new ComplexC(re, im)
 }
 
+function normalizeAngleDeg(deg) {
+  let value = deg
+  while (value > 180) value -= 360
+  while (value <= -180) value += 360
+  return value
+}
+
+function buildRelayTesterShot(payload) {
+  const channels = [
+    { number: 'UA', quantity: 'U', magnitude: round(payload.U_A_V, 4), angle_deg: round(payload.phi_U_A_deg, 2), unit: 'V' },
+    { number: 'UB', quantity: 'U', magnitude: round(payload.U_B_V, 4), angle_deg: round(payload.phi_U_B_deg, 2), unit: 'V' },
+    { number: 'UC', quantity: 'U', magnitude: round(payload.U_C_V, 4), angle_deg: round(payload.phi_U_C_deg, 2), unit: 'V' },
+    { number: 'IA', quantity: 'I', magnitude: round(payload.I_A_A, 4), angle_deg: round(payload.phi_I_A_deg, 2), unit: 'A' },
+    { number: 'IB', quantity: 'I', magnitude: round(payload.I_B_A, 4), angle_deg: round(payload.phi_I_B_deg, 2), unit: 'A' },
+    { number: 'IC', quantity: 'I', magnitude: round(payload.I_C_A, 4), angle_deg: round(payload.phi_I_C_deg, 2), unit: 'A' },
+  ]
+
+  return {
+    frequency_hz: 50,
+    prefault_hold_s: 0.3,
+    fault_hold_s: 1.0,
+    expected_trip_time_s: payload.t_action_s,
+    channels,
+  }
+}
+
 /**
  * 相间短路（正序+负序）计算
  */
@@ -113,8 +139,10 @@ export function calcPhaseFault({
   const Iout = magnitude(I_x) / nCT
   const phi_UI = degrees(phase(U_xy) - phase(I_x))
 
-  // 测量阻抗（二次值模）
-  const Zm_magnitude = Uout / Iout
+  // 测量阻抗（二次值复数）
+  const Zm_complex = U_xy.divide(I_x)
+  const Zm_magnitude = magnitude(Zm_complex) / (nPT / nCT)
+  const Zm_angle_deg = degrees(phase(Zm_complex))
 
   // 段别判断
   let zone = 'No trip'
@@ -163,10 +191,26 @@ export function calcPhaseFault({
     phi_I_B_deg: round(phi_I_B, 2),
     phi_I_C_deg: round(phi_I_C, 2),
     Zm_ohm: round(Zm_magnitude, 4),
-    Zm_complex_re: 0,
-    Zm_complex_im: 0,
+    Zm_angle_deg: round(normalizeAngleDeg(Zm_angle_deg), 2),
+    Zm_complex_re: round(Zm_complex.re / (nPT / nCT), 4),
+    Zm_complex_im: round(Zm_complex.im / (nPT / nCT), 4),
     t_action_s: t_action,
-    zone: zone
+    zone: zone,
+    relay_tester_shot: buildRelayTesterShot({
+      U_A_V: round(U_A_mag, 4),
+      U_B_V: round(U_B_mag, 4),
+      U_C_V: round(U_C_mag, 4),
+      I_A_A: round(I_A_mag, 4),
+      I_B_A: round(I_B_mag, 4),
+      I_C_A: round(I_C_mag, 4),
+      phi_U_A_deg: round(phi_U_A, 2),
+      phi_U_B_deg: round(phi_U_B, 2),
+      phi_U_C_deg: round(phi_U_C, 2),
+      phi_I_A_deg: round(phi_I_A, 2),
+      phi_I_B_deg: round(phi_I_B, 2),
+      phi_I_C_deg: round(phi_I_C, 2),
+      t_action_s: t_action
+    })
   }
 }
 
@@ -211,8 +255,9 @@ export function calcDirectionalDistance({
     t_III: null
   })
 
-  // 测量阻抗（一次值模）
-  const Zm_magnitude = baseResult.Zm_ohm * (nPT / nCT)
+  // 测量阻抗（一次值复数）
+  const Zm_vec = complex(baseResult.Zm_complex_re, baseResult.Zm_complex_im)
+  const Zm_magnitude = Zm_vec.abs()
 
   // 方向圆参数
   const theta_sens_rad = theta_sens_deg * pi / 180
@@ -220,13 +265,12 @@ export function calcDirectionalDistance({
     K_offset * Zset_ohm * Math.cos(theta_sens_rad),
     K_offset * Zset_ohm * Math.sin(theta_sens_rad)
   )
-  const Zm_vec = complex(Zm_magnitude, 0) // 简化：方向仅看角度，暂不计算完整复数
   const dist_to_center = magnitude(Zm_vec.sub(Z0))
   const in_circle = dist_to_center <= Zset_ohm
 
   // 角度窗口（简化：用已知的线路阻抗角近似 Zm 角度）
   // 实际上 Zm 角度 = φ_U - φ_I
-  const Zm_angle_deg = baseResult.phi_U_A_deg - baseResult.phi_I_A_deg // 取A相近似
+  const Zm_angle_deg = baseResult.Zm_angle_deg
   let Zm_angle_rad = Zm_angle_deg * pi / 180
   let angle_diff = Zm_angle_rad - theta_sens_rad
   while (angle_diff > pi) angle_diff -= 2 * pi
@@ -240,6 +284,8 @@ export function calcDirectionalDistance({
     d_km: d_km,
     Zm_ohm: round(Zm_magnitude, 4),
     Zm_angle_deg: round(Zm_angle_deg, 2),
+    Zm_complex_re: round(Zm_vec.re, 4),
+    Zm_complex_im: round(Zm_vec.im, 4),
     Zset_ohm: round(Zset_ohm, 4),
     theta_sens_deg: round(theta_sens_deg, 2),
     K_offset: round(K_offset, 4),
@@ -261,6 +307,21 @@ export function calcDirectionalDistance({
     phi_I_A_deg: baseResult.phi_I_A_deg,
     phi_I_B_deg: baseResult.phi_I_B_deg,
     phi_I_C_deg: baseResult.phi_I_C_deg,
+    relay_tester_shot: buildRelayTesterShot({
+      U_A_V: baseResult.U_A_V,
+      U_B_V: baseResult.U_B_V,
+      U_C_V: baseResult.U_C_V,
+      I_A_A: baseResult.I_A_A,
+      I_B_A: baseResult.I_B_A,
+      I_C_A: baseResult.I_C_A,
+      phi_U_A_deg: baseResult.phi_U_A_deg,
+      phi_U_B_deg: baseResult.phi_U_B_deg,
+      phi_U_C_deg: baseResult.phi_U_C_deg,
+      phi_I_A_deg: baseResult.phi_I_A_deg,
+      phi_I_B_deg: baseResult.phi_I_B_deg,
+      phi_I_C_deg: baseResult.phi_I_C_deg,
+      t_action_s: trip ? t_set : null
+    })
   }
 }
 

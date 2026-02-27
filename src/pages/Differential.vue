@@ -416,28 +416,11 @@ function clearAll() {
 }
 
 function runValidation() {
-  console.log('runValidation called')
   if (!errors.value || errors.value.length === 0) {
     calculating.value = true
     try {
       const nCTH = parseCTRatio(params.nCTH_str)
       const nCTL = parseCTRatio(params.nCTL_str)
-
-      console.log('Calling calcDifferentialTest with:', {
-        Sn_MVA: params.Sn_MVA,
-        UH_kV: params.UH_kV,
-        UL_kV: params.UL_kV,
-        groupStr: params.groupStr,
-        nCTH, nCTL,
-        Id_min_pu: settings.Id_min,
-        K1: settings.K1,
-        K2: settings.K2,
-        Ir_break_pu: settings.Ir_break,
-        Ir_mode: params.Ir_mode,
-        compDir: params.compDir,
-        injectMode: config.injectMode,
-        ctChannels: config.ctChannels
-      })
 
       const result = calcDifferentialTest({
         Sn_MVA: params.Sn_MVA,
@@ -456,7 +439,6 @@ function runValidation() {
         ctChannels: config.ctChannels
       })
 
-      console.log('calcDifferentialTest result:', result)
       results.value = result
       showDebugModal.value = false
     } catch (e) {
@@ -482,7 +464,6 @@ function isTrialExpectedTrip(pt) {
 function copyTestPlan() {
   if (!results.value) return
   const r = results.value
-  const inject = r.slope_test_points[0]?.inject || {}
   const lines = [
     '【差动保护校验方案】',
     `主变：${params.Sn_MVA} MVA, ${params.UH_kV}/${params.UL_kV} kV, ${params.groupStr}`,
@@ -494,15 +475,27 @@ function copyTestPlan() {
   ]
 
   r.slope_test_points.forEach(pt => {
+    const inject = pt.inject || {}
     lines.push(`Ir=${pt.Ir_pu}, Id_boundary=${pt.Id_boundary}`)
     if (config.injectMode === 'single_phase') {
-      lines.push(`  H_A=${inject.I_H_A?.magnitude.toFixed(1)}/${inject.I_H_A?.angle_deg}°, L_A=${inject.I_L_A?.magnitude.toFixed(1)}/${inject.I_L_A?.angle_deg}°`)
+      lines.push(`  H_A=${inject.I_H_A?.magnitude?.toFixed(1) ?? '-'} / ${inject.I_H_A?.angle_deg ?? '-'}°, L_A=${inject.I_L_A?.magnitude?.toFixed(1) ?? '-'} / ${inject.I_L_A?.angle_deg ?? '-'}°`)
     } else {
-      lines.push(`  H：(A${inject.I_H_A?.magnitude.toFixed(1)}/${inject.I_H_A?.angle_deg}° B${inject.I_H_B?.magnitude.toFixed(1)}/${inject.I_H_B?.angle_deg}° C${inject.I_H_C?.magnitude.toFixed(1)}/${inject.I_H_C?.angle_deg}°)`)
-      lines.push(`  L：(A${inject.I_L_A?.magnitude.toFixed(1)}/${inject.I_L_A?.angle_deg}° B${inject.I_L_B?.magnitude.toFixed(1)}/${inject.I_L_B?.angle_deg}° C${inject.I_L_C?.magnitude.toFixed(1)}/${inject.I_L_C?.angle_deg}°)`)
+      lines.push(`  H：(A${inject.I_H_A?.magnitude?.toFixed(1) ?? '-'} / ${inject.I_H_A?.angle_deg ?? '-'}° B${inject.I_H_B?.magnitude?.toFixed(1) ?? '-'} / ${inject.I_H_B?.angle_deg ?? '-'}° C${inject.I_H_C?.magnitude?.toFixed(1) ?? '-'} / ${inject.I_H_C?.angle_deg ?? '-'}°)`)
+      lines.push(`  L：(A${inject.I_L_A?.magnitude?.toFixed(1) ?? '-'} / ${inject.I_L_A?.angle_deg ?? '-'}° B${inject.I_L_B?.magnitude?.toFixed(1) ?? '-'} / ${inject.I_L_B?.angle_deg ?? '-'}° C${inject.I_L_C?.magnitude?.toFixed(1) ?? '-'} / ${inject.I_L_C?.angle_deg ?? '-'}°)`)
     }
   })
 
+
+  if (Array.isArray(r.relay_tester_plan) && r.relay_tester_plan.length) {
+    lines.push('')
+    lines.push('调试仪步骤参数：')
+    r.relay_tester_plan.forEach(step => {
+      lines.push(`步骤${step.step} ${step.name} | 频率=${step.frequency_hz}Hz | 保持=${step.hold_time_s}s | 超时=${step.timeout_s}s`)
+      step.channels.forEach(ch => {
+        lines.push(`  CH${ch.number}(${ch.side}) = ${Number(ch.magnitude_A).toFixed(3)}A ∠${ch.angle_deg}°`)
+      })
+    })
+  }
   lines.push('')
   lines.push('接线：')
   if (config.ctChannels === 6) {

@@ -4,7 +4,6 @@
  */
 
 import { Complex } from './vectorMath.js'
-import { getPhaseShiftRad } from './ctModel.js'
 
 // 本地工具：避免模块依赖问题
 function roundTo(value, digits) {
@@ -91,10 +90,35 @@ export function getCompensationMatrix(groupStr, compDir) {
 // 应用补偿矩阵到三相电流向量
 export function applyCompensation(Iabc, M) {
   const [IA, IB, IC] = Iabc
-  const IA_c = M[0][0].add(M[0][1].multiply(IB)).add(M[0][2].multiply(IC))
-  const IB_c = M[1][0].add(M[1][1].multiply(IB)).add(M[1][2].multiply(IC))
-  const IC_c = M[2][0].add(M[2][1].multiply(IB)).add(M[2][2].multiply(IC))
+  const IA_c = M[0][0].multiply(IA).add(M[0][1].multiply(IB)).add(M[0][2].multiply(IC))
+  const IB_c = M[1][0].multiply(IA).add(M[1][1].multiply(IB)).add(M[1][2].multiply(IC))
+  const IC_c = M[2][0].multiply(IA).add(M[2][1].multiply(IB)).add(M[2][2].multiply(IC))
   return [IA_c, IB_c, IC_c]
+}
+
+function buildDiffRelayTesterPlan(points, injectMode, ctChannels, frequencyHz = 50) {
+  return points.map((pt, idx) => {
+    const inject = pt.inject
+    const channels = [
+      { number: 1, quantity: 'I', side: 'H-A', magnitude_A: inject.I_H_A.magnitude, angle_deg: inject.I_H_A.angle_deg },
+      { number: 2, quantity: 'I', side: 'H-B', magnitude_A: inject.I_H_B.magnitude, angle_deg: inject.I_H_B.angle_deg },
+      { number: 3, quantity: 'I', side: 'H-C', magnitude_A: inject.I_H_C.magnitude, angle_deg: inject.I_H_C.angle_deg },
+      { number: 4, quantity: 'I', side: 'L-A', magnitude_A: inject.I_L_A.magnitude, angle_deg: inject.I_L_A.angle_deg },
+      { number: 5, quantity: 'I', side: 'L-B', magnitude_A: inject.I_L_B.magnitude, angle_deg: inject.I_L_B.angle_deg },
+      { number: 6, quantity: 'I', side: 'L-C', magnitude_A: inject.I_L_C.magnitude, angle_deg: inject.I_L_C.angle_deg }
+    ].filter(ch => ctChannels === 6 || ch.number <= 3)
+
+    return {
+      step: idx + 1,
+      name: `Ir=${pt.Ir_pu} pu 边界点`,
+      expected: pt.expected,
+      hold_time_s: 0.2,
+      timeout_s: 1.0,
+      frequency_hz: frequencyHz,
+      inject_mode: injectMode,
+      channels
+    }
+  })
 }
 
 // ───────────────────────────────────────────────────────────────────
@@ -291,12 +315,14 @@ export function calcDifferentialTest({
     // 测试点
     slope_test_points: curve,
 
+    relay_tester_plan: buildDiffRelayTesterPlan(curve, injectMode, ctChannels),
+
     // 特性曲线
     characteristic_curve,
 
     // 接线指导
     wiring_guide: {
-      ct_channels,
+      ct_channels: ctChannels,
       method: ctChannels === 6 ? 'six_channel_full' : 'three_channel_single_side',
       H_terminal: '保护装置高压侧电流输入端子（IHA/IHB/IHC）',
       L_terminal: ctChannels === 6 ? '保护装置低压侧电流输入端子（ILA/ILB/ILC）' : '短接或悬空（根据装置TA断线逻辑）',

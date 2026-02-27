@@ -148,6 +148,15 @@
           </tbody>
         </table>
       </div>
+
+      <div class="mt-4 p-4 bg-gray-800 rounded text-sm" v-if="results[0]?.relay_tester_shot">
+        <p class="text-gray-300 font-semibold mb-2">继保调试仪建议参数（单次故障步）</p>
+        <p class="text-gray-400 mb-2">频率 {{ results[0].relay_tester_shot.frequency_hz }} Hz，故障前保持 {{ results[0].relay_tester_shot.prefault_hold_s }} s，故障保持 {{ results[0].relay_tester_shot.fault_hold_s }} s</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div v-for="ch in results[0].relay_tester_shot.channels" :key="ch.number" class="text-gray-300 font-mono">{{ ch.number }} = {{ ch.magnitude.toFixed(3) }} {{ ch.unit }} ∠{{ ch.angle_deg.toFixed(2) }}°</div>
+        </div>
+      </div>
+
       <div class="mt-4 p-4 bg-gray-800 rounded text-sm">
         <p class="text-gray-400 mb-1">调试台接线说明：</p>
         <p class="text-gray-300">- 电压：三路电压通道对应 U_A、U_B、U_C（线电压 U_AB 按下式计算：U_AB = |U_A - U_B|，但通常调试仪直接输出相电压）</p>
@@ -194,9 +203,19 @@ const calculating = ref(false)
 const results = ref([])
 
 function runValidation() {
+  if (!system.Un_kV || !system.nCT || !system.nPT || measurement.L_km <= 0) {
+    alert('请先填写完整且有效的系统参数')
+    return
+  }
+
+  const d_km = measurement.simulateLine
+    ? Math.min(Math.max(Number(measurement.d_km) || 0, 0), Number(measurement.L_km))
+    : 0
+
+  measuringAdjust(d_km)
+
   calculating.value = true
   try {
-    // 为了演示，我们只生成一个故障情况。可以以后扩展为多步序列。
     const res = calcPhaseFault({
       Un_kV: system.Un_kV,
       nCT: system.nCT,
@@ -205,7 +224,7 @@ function runValidation() {
       X1_per_km: system.X1_per_km,
       RS: system.RS,
       XS: system.XS,
-      d_km: measurement.d_km,
+      d_km,
       Rf: measurement.Rf,
       fault_type: measurement.fault_type,
       Zset_I: settings.Z_I,
@@ -221,13 +240,25 @@ function runValidation() {
   }
 }
 
+function measuringAdjust(d_km) {
+  if (measurement.simulateLine) {
+    measurement.d_km = d_km
+  }
+}
+
 function copyResults() {
   if (!results.value.length) return
   const header = '序号,故障类型,U_A (V/°),U_B (V/°),U_C (V/°),I_A (A/°),I_B (A/°),I_C (A/°),Z_meas (Ω),动作,理论时间 (s)'
   const rows = results.value.map((r, i) =>
     `${i+1},${r.fault_type},${r.U_A_V.toFixed(1)}/${r.phi_U_A_deg.toFixed(1)}°,${r.U_B_V.toFixed(1)}/${r.phi_U_B_deg.toFixed(1)}°,${r.U_C_V.toFixed(1)}/${r.phi_U_C_deg.toFixed(1)}°,${r.I_A_A.toFixed(2)}/${r.phi_I_A_deg.toFixed(1)}°,${r.I_B_A.toFixed(2)}/${r.phi_I_B_deg.toFixed(1)}°,${r.I_C_A.toFixed(2)}/${r.phi_I_C_deg.toFixed(1)}°,${r.Zm_ohm},${r.zone !== 'No trip' ? '动作' : '不动作'},${r.t_action_s !== null ? r.t_action_s.toFixed(3) : '-'}`
   )
-  const text = [header, ...rows].join('\n')
+  const tester = results.value[0]?.relay_tester_shot
+  const testerLines = tester ? [
+    '',
+    `调试仪参数: f=${tester.frequency_hz}Hz, 故障前保持=${tester.prefault_hold_s}s, 故障保持=${tester.fault_hold_s}s, 预期动作时间=${tester.expected_trip_time_s ?? '-'}s`,
+    ...tester.channels.map(ch => `${ch.number}=${ch.magnitude.toFixed(3)}${ch.unit} ∠${ch.angle_deg.toFixed(2)}°`)
+  ] : []
+  const text = [header, ...rows, ...testerLines].join('\n')
   navigator.clipboard.writeText(text).then(() => {
     alert('复制成功')
   }).catch(() => alert('复制失败'))
