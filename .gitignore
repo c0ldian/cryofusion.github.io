@@ -1,3 +1,16 @@
+# OpenClaw workspace configuration (moved to private repo)
+AGENTS.md
+USER.md
+SOUL.md
+IDENTITY.md
+TOOLS.md
+HEARTBEAT.md
+BOOTSTRAP.md
+MEMORY.md
+memory/
+.openclaw/
+.vscode/
+
 # Logs
 logs
 *.log
@@ -13,8 +26,6 @@ dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
 .idea
 .DS_Store
 *.suo
