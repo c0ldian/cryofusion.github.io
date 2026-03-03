@@ -1,0 +1,4 @@
+.glow-blue { border: 1px solid var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent-glow), inset 0 0 12px var(--color-accent-glow); }
+.glow-green { border: 1px solid var(--color-success); box-shadow: 0 0 0 1px var(--color-success-glow), inset 0 0 8px var(--color-success-glow); }
+.glow-red { border: 1px solid var(--color-error); box-shadow: 0 0 0 1px rgba(255,82,82,.12), inset 0 0 8px rgba(255,82,82,.08); }
+.numeric, .result-value, .phasor-value, input[type='number'] { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }

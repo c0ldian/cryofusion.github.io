@@ -1,0 +1,31 @@
+:root {
+  --color-bg-base: #0d1117;
+  --color-bg-surface: #161b22;
+  --color-bg-elevated: #1c2230;
+  --color-bg-input: #0d1117;
+  --color-bg-sidebar: #10151c;
+  --color-border: #21262d;
+  --color-border-subtle: #2d333b;
+  --color-border-active: #4fc3f7;
+  --color-accent: #4fc3f7;
+  --color-accent-dim: #1c4f6b;
+  --color-accent-glow: rgba(79, 195, 247, 0.15);
+  --color-success: #69f0ae;
+  --color-success-dim: #1a4a37;
+  --color-success-glow: rgba(105, 240, 174, 0.12);
+  --color-warning: #ffd54f;
+  --color-warning-dim: #4a3a00;
+  --color-error: #ff5252;
+  --color-error-dim: #4a1010;
+  --color-text-primary: #e6edf3;
+  --color-text-secondary: #8b949e;
+  --color-text-disabled: #484f58;
+  --color-text-accent: #4fc3f7;
+  --color-text-success: #69f0ae;
+  --color-text-error: #ff5252;
+  --color-text-warning: #ffd54f;
+  --color-numeric: #a5d6ff;
+  --font-ui: 'IBM Plex Sans', 'Noto Sans SC', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --font-display: 'Rajdhani', 'IBM Plex Sans', sans-serif;
+}

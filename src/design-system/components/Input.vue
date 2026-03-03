@@ -8,16 +8,16 @@
       <input
         :type="type"
         :value="modelValue"
-        @input="$emit('update:modelValue', $event.target.value)"
+        @input="handleInput"
         :placeholder="placeholder"
         :disabled="disabled"
         :class="[
-          'w-full bg-surface border rounded-lg px-4 py-3 text-text-primary transition-all duration-200',
-          'focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500',
+          'w-full bg-surface border rounded-md px-4 py-3 text-text-primary transition-all duration-200',
+          'focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-glow)] focus:border-[var(--color-border-active)]',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           error ? 'border-error-500 focus:ring-error-500/50 focus:border-error-500' : 'border-border hover:border-gray-600',
           success ? 'border-success-500 focus:ring-success-500/50' : '',
-          size === 'sm' ? 'text-sm py-2 px-3' : '',
+          size === 'sm' ? 'text-sm py-2 px-3' : '', 'font-mono',
           className
         ]"
       />
@@ -60,5 +60,21 @@ defineProps({
   className: String
 })
 
-defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue'])
+
+function handleInput(event) {
+  const raw = event.target.value
+  if (raw === '') {
+    emit('update:modelValue', raw)
+    return
+  }
+
+  if (['number', 'range'].includes((event.target.type || '').toLowerCase())) {
+    const parsed = Number(raw)
+    emit('update:modelValue', Number.isNaN(parsed) ? raw : parsed)
+    return
+  }
+
+  emit('update:modelValue', raw)
+}
 </script>

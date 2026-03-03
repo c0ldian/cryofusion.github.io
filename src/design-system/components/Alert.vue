@@ -1,7 +1,7 @@
 <template>
   <div
     :class="[
-      'rounded-lg p-4 border',
+      'rounded-md p-4 border',
       variantStyles
     ]"
     role="alert"
@@ -37,7 +37,7 @@
 <script setup>
 import { computed } from 'vue'
 
-defineProps({
+const props = defineProps({
   variant: {
     type: String,
     default: 'info',
@@ -54,12 +54,12 @@ defineEmits(['dismiss'])
 
 const variantStyles = computed(() => {
   const styles = {
-    info: 'bg-primary-900/20 border-primary-700/50',
-    success: 'bg-success-900/20 border-success-700/30',
-    warning: 'bg-warning-900/20 border-warning-600/30',
-    error: 'bg-error-900/20 border-error-700/30'
+    info: 'bg-[var(--color-accent-dim)]/50 border-[var(--color-accent)]/60',
+    success: 'bg-[var(--color-success-dim)]/60 border-[var(--color-success)]/60',
+    warning: 'bg-[var(--color-warning-dim)]/60 border-[var(--color-warning)]/60',
+    error: 'bg-[var(--color-error-dim)]/60 border-[var(--color-error)]/60'
   }
-  return styles[variant.value]
+  return styles[props.variant]
 })
 
 const textColor = computed(() => {
@@ -69,6 +69,6 @@ const textColor = computed(() => {
     warning: 'text-warning-400',
     error: 'text-error-400'
   }
-  return colors[variant.value]
+  return colors[props.variant]
 })
 </script>

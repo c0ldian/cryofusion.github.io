@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-surface rounded-xl border border-border shadow-lg overflow-hidden transition-shadow duration-300"
-       :class="hoverable ? 'hover:shadow-xl hover:shadow-blue-900/20 hover:border-primary-600/50' : ''">
-    <div v-if="$slots.header || title" class="px-4 md:px-6 py-4 border-b border-border bg-surfaceHighlight/30">
+  <div class="bg-surface rounded-lg border border-border overflow-hidden transition-all duration-150"
+       :class="hoverable ? 'hover:border-[var(--color-border-active)]' : ''">
+    <div v-if="$slots.header || title" class="px-4 md:px-6 py-4 border-b border-border bg-surfaceHighlight/20">
       <slot name="header">
         <h3 class="text-lg font-semibold text-text-primary">{{ title }}</h3>
       </slot>

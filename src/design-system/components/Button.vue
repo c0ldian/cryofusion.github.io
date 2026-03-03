@@ -3,7 +3,7 @@
     :type="type"
     :disabled="disabled || loading"
     :class="[
-      'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface',
+      'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-surface',
       variantStyles,
       sizeStyles,
       className
@@ -47,12 +47,12 @@ defineEmits(['click'])
 const variantStyles = computed(() => {
   const base = 'focus:ring-primary-500'
   const styles = {
-    primary: 'bg-primary-600 hover:bg-primary-700 text-white disabled:bg-primary-800',
-    secondary: 'bg-gray-700 hover:bg-gray-600 text-white disabled:bg-gray-800',
+    primary: 'bg-[var(--color-accent)] hover:brightness-110 text-[#0d1117] disabled:opacity-50',
+    secondary: 'bg-transparent border border-border hover:border-[var(--color-accent)] text-text-primary disabled:opacity-50',
     success: 'bg-success-500 hover:bg-success-600 text-white disabled:bg-success-700',
     warning: 'bg-warning-500 hover:bg-warning-600 text-white disabled:bg-warning-600',
     danger: 'bg-error-500 hover:bg-error-600 text-white disabled:bg-error-700',
-    ghost: 'bg-transparent hover:bg-surfaceHighlight text-text-primary hover:text-white border border-border'
+    ghost: 'bg-transparent hover:bg-surfaceHighlight text-text-secondary hover:text-text-primary border border-border'
   }
   return `${base} ${styles[props.variant]}`
 })
