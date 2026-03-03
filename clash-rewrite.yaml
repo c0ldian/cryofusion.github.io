@@ -1,0 +1,24 @@
+# ====================
+# Clash Rewrite（URL 重写）
+# ====================
+# 来源：rewrite_local + rewrite_remote (仅 ksb.snippet)
+
+# 1. 本地重写（原 rewrite_local）
+# Google CN 强制跳转
+- URL-REGEX,^https?://(www\.)?google\.cn,302://www.google.com
+
+# 2. ksb.snippet (Termius Pro 解锁)
+# 这是一个 response-body 修改脚本，Clash 需用 script 插件支持
+# 在 Clash.Meta 中，可在配置中加入：
+#
+# script:
+#   - name: Termius Pro Unlock
+#     type: http-response
+#     behavior: domain
+#     requires-body: true
+#     max-size: 0
+#     url: https://raw.githubusercontent.com/Peng-Lx/lxpscript/master/JS/langkhach/Termius.js
+#
+# 注意：需要开启 experimental.ignore-resolve-fail 和 script 支持
+
+# 3. 其他 rewrite_remote 已忽略（根据需求）

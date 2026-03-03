@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import ShortCircuit from '../pages/ShortCircuitTest.vue'
+import Home from '../pages/HomeNew.vue'
+import ShortCircuitTest from '../pages/ShortCircuitTestNew.vue'
 import ShortCircuitCurrent from '../pages/ShortCircuitCurrent.vue'
 import OverCurrent from '../pages/OverCurrent.vue'
 import DistanceIndex from '../pages/distance/index.vue'
@@ -10,11 +11,10 @@ import CtRatio from '../pages/CtRatio.vue'
 import PtRatio from '../pages/PtRatio.vue'
 import RecloseTime from '../pages/RecloseTime.vue'
 import Sensitivity from '../pages/Sensitivity.vue'
-import Home from '../pages/Home.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
-  { path: '/calculators/short-circuit', name: 'ShortCircuit', component: ShortCircuit },
+  { path: '/calculators/short-circuit', name: 'ShortCircuit', component: ShortCircuitTest },
   { path: '/calculators/short-circuit-current', name: 'ShortCircuitCurrent', component: ShortCircuitCurrent },
   { path: '/calculators/distance', name: 'DistanceIndex', component: DistanceIndex },
   { path: '/calculators/distance/phase', name: 'PhaseDistance', component: PhaseDistance },

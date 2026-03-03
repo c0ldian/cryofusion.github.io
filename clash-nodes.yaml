@@ -1,0 +1,28 @@
+# ====================
+# Clash Nodes（仅节点列表）
+# ====================
+# 此文件仅用于定义 providers，实际节点由订阅自动获取
+# 你现有的两个订阅：
+# 1. yiyo26 - yiyoDNS
+# 2. zju1 - kyapi
+
+provider-version: 1
+
+# 由于原配置的订阅 URL 需要动态解析，建议使用 Sub-Store 转换为 Clash 格式
+# 转换后可直接填入下方 proxies 列表
+
+# 示例占位（实际由 proxy-providers 加载）
+# proxies:
+#   - name: "yiyo26-01"
+#     type: ss
+#     server: server1.example.com
+#     port: 8388
+#     cipher: aes-256-gcm
+#     password: "password"
+#   - name: "zju1-01"
+#     type: vmess
+#     server: server2.example.com
+#     port: 8443
+#     uuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+#     alterId: 0
+#     cipher: auto
