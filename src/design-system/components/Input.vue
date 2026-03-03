@@ -8,7 +8,7 @@
       <input
         :type="type"
         :value="modelValue"
-        @input="$emit('update:modelValue', $event.target.value)"
+        @input="handleInput"
         :placeholder="placeholder"
         :disabled="disabled"
         :class="[
@@ -60,5 +60,21 @@ defineProps({
   className: String
 })
 
-defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue'])
+
+function handleInput(event) {
+  const raw = event.target.value
+  if (raw === '') {
+    emit('update:modelValue', raw)
+    return
+  }
+
+  if (['number', 'range'].includes((event.target.type || '').toLowerCase())) {
+    const parsed = Number(raw)
+    emit('update:modelValue', Number.isNaN(parsed) ? raw : parsed)
+    return
+  }
+
+  emit('update:modelValue', raw)
+}
 </script>
