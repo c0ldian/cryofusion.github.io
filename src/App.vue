@@ -1,15 +1,15 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { theme } from './design-system'
 
-const collapsed = ref(false)
 const mobileOpen = ref(false)
 const route = useRoute()
 
 const buildTime = __BUILD_TIME__
 
 const navItems = [
+  { name: 'home', label: '首页', path: '/' },
   { name: 'short-circuit', label: '短路试验计算' },
   { name: 'short-circuit-current', label: '短路电流计算' },
   { name: 'over-current', label: '过流保护' },
@@ -19,14 +19,13 @@ const navItems = [
   { name: 'pt-ratio', label: 'PT 变比' },
   { name: 'reclose-time', label: '重合闸时间' },
   { name: 'sensitivity', label: '灵敏度校验' },
+  { name: 'load-angle-verification', label: '带负荷相角校验' },
 ]
 
 function isActive(item) {
-  const path = route.path
-  if (path === `/calculators/${item.name}`) return true
-  if (path.startsWith(`/calculators/${item.name}/`)) return true
-  if (path === '/' && item.name === 'short-circuit') return true
-  return false
+  if (item.path === '/') return route.path === '/'
+  const basePath = item.path || `/calculators/${item.name}`
+  return route.path === basePath || route.path.startsWith(`${basePath}/`)
 }
 
 // Inject theme for global CSS variables
@@ -69,7 +68,7 @@ provide('theme', theme)
         <ul class="space-y-1">
           <li v-for="item in navItems" :key="item.name">
             <RouterLink
-              :to="`/calculators/${item.name}`"
+              :to="item.path || `/calculators/${item.name}`"
               class="block px-3 py-2 rounded-lg transition-all duration-200"
               :class="isActive(item) ? '' : 'opacity-70 hover:opacity-100'"
               :style="{
@@ -93,7 +92,7 @@ provide('theme', theme)
     </aside>
 
     <!-- 主内容 -->
-    <main class="flex-1 min-w-0 overflow-y-auto">
+    <main class="flex-1 min-w-0 overflow-y-auto bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.12),_transparent_45%),radial-gradient(circle_at_80%_20%,_rgba(168,85,247,0.10),_transparent_45%)]">
       <div class="max-w-6xl mx-auto p-4 md:p-6 lg:p-8">
         <!-- 移动端顶部栏 -->
         <header class="md:hidden mb-6 flex items-center">
