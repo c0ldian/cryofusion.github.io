@@ -361,21 +361,33 @@ const PhasorSvg = defineComponent({
       h('circle', { cx: 160, cy: 160, r: 90, stroke: '#4b5563', 'stroke-width': 1, fill: 'none' }),
       h('line', { x1: 20, y1: 160, x2: 300, y2: 160, stroke: '#374151', 'stroke-width': 1 }),
       h('line', { x1: 160, y1: 20, x2: 160, y2: 300, stroke: '#374151', 'stroke-width': 1 }),
-      ...props.vectors.map(v => {
-        const amp = Math.min(Math.max(Number(v.amp) || 0, 0), 10)
-        const r = amp === 0 ? 0 : (amp / 10) * 90
-        const rad = (Number(v.ang) || 0) * Math.PI / 180
-        const x = 160 + r * Math.cos(rad)
-        const y = 160 - r * Math.sin(rad)
-        return h('g', { key: v.key }, [
-          h('line', {
-            x1: 160, y1: 160, x2: x, y2: y, stroke: v.color, 'stroke-width': 2,
-            'stroke-dasharray': v.dashed ? '5,4' : '0'
-          }),
-          h('circle', { cx: x, cy: y, r: 2.5, fill: v.color }),
-          h('text', { x: x + 4, y: y - 4, fill: v.color, 'font-size': 11 }, `${v.key} ${Number(v.ang).toFixed(1)}°`)
-        ])
-      })
+      ...(() => {
+        const vals = props.vectors || []
+        const u = vals.filter(v => String(v.key || '').startsWith('U')).map(v => Math.abs(Number(v.amp) || 0))
+        const i = vals.filter(v => String(v.key || '').startsWith('I')).map(v => Math.abs(Number(v.amp) || 0))
+        const maxU = Math.max(...u, 1)
+        const maxI = Math.max(...i, 1)
+        const minRadius = 26
+
+        return vals.map(v => {
+          const amp = Math.max(Math.abs(Number(v.amp) || 0), 0)
+          const isCurrent = String(v.key || '').startsWith('I')
+          const denom = isCurrent ? maxI : maxU
+          const ratio = denom > 0 ? amp / denom : 0
+          const r = amp === 0 ? 0 : Math.max(minRadius, ratio * 90)
+          const rad = (Number(v.ang) || 0) * Math.PI / 180
+          const x = 160 + r * Math.cos(rad)
+          const y = 160 - r * Math.sin(rad)
+          return h('g', { key: v.key }, [
+            h('line', {
+              x1: 160, y1: 160, x2: x, y2: y, stroke: v.color, 'stroke-width': 2,
+              'stroke-dasharray': v.dashed ? '5,4' : '0'
+            }),
+            h('circle', { cx: x, cy: y, r: 2.5, fill: v.color }),
+            h('text', { x: x + 4, y: y - 4, fill: v.color, 'font-size': 11 }, `${v.key} ${Number(v.ang).toFixed(1)}°`)
+          ])
+        })
+      })()
     ])
   }
 })
