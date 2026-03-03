@@ -29,11 +29,11 @@
 
     <!-- Bento Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <a
+      <RouterLink
         v-for="item in calculators"
         :key="item.name"
         :to="`/calculators/${item.name}`"
-        class="group block bg-surface rounded-xl border border-border p-5 hover:border-primary-500/50 hover:shadow-lg hover:shadow-primary-500/10 transition-all duration-300"
+        class="group block bg-surface/90 backdrop-blur rounded-2xl border border-border p-5 hover:border-primary-500/50 hover:shadow-lg hover:shadow-primary-500/10 transition-all duration-300"
       >
         <div class="flex items-start justify-between mb-3">
           <div class="flex items-center justify-center w-12 h-12 rounded-xl text-white"
@@ -54,7 +54,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
         </div>
-      </a>
+      </RouterLink>
     </div>
 
     <!-- Footer -->
@@ -67,6 +67,8 @@
 </template>
 
 <script>
+import { RouterLink } from 'vue-router'
+
 const calculators = [
   {
     name: 'short-circuit',
@@ -125,6 +127,13 @@ const calculators = [
     icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
   },
   {
+    name: 'load-angle-verification',
+    label: '带负荷相角校验',
+    description: '三相电压电流相角与功率因数现场校验',
+    color: 'bg-gradient-to-br from-violet-500 to-fuchsia-700',
+    icon: 'M13 16h-1v-4h-1m4 4h-1V8h-1m-4 8H8v-6H7m13-3a9 9 0 11-18 0 9 9 0 0118 0z'
+  },
+  {
     name: 'sensitivity',
     label: '灵敏度校验',
     description: '保护灵敏度校验计算',
@@ -135,6 +144,7 @@ const calculators = [
 
 export default {
   name: 'Home',
+  components: { RouterLink },
   setup() {
     return {
       calculators
