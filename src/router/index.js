@@ -11,6 +11,7 @@ import CtRatio from '../pages/CtRatio.vue'
 import PtRatio from '../pages/PtRatio.vue'
 import RecloseTime from '../pages/RecloseTime.vue'
 import Sensitivity from '../pages/Sensitivity.vue'
+import LoadAngleVerification from '../pages/LoadAngleVerification.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -25,6 +26,7 @@ const routes = [
   { path: '/calculators/pt-ratio', name: 'PtRatio', component: PtRatio },
   { path: '/calculators/reclose-time', name: 'RecloseTime', component: RecloseTime },
   { path: '/calculators/sensitivity', name: 'Sensitivity', component: Sensitivity },
+  { path: '/calculators/load-angle-verification', name: 'LoadAngleVerification', component: LoadAngleVerification },
 ]
 
 const router = createRouter({

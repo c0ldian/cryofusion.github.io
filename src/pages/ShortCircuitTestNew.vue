@@ -1,6 +1,6 @@
 <template>
   <CalculatorLayout
-    v-model="formData"
+    :model-value="formData"
     :title="'主变短路试验计算'"
     :description="'计算主变短路试验时的电流、电压值'"
     :sections="sections"
